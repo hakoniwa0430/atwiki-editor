@@ -1,0 +1,8 @@
+{
+  "見出し": { "prefix": "heading", "body": ["*${1:見出し}", "$0"] },
+  "表": { "prefix": "table", "body": ["|${1:項目}|${2:説明}|h", "|${3:項目名}|${4:内容}|", "$0"] },
+  "アンカー": { "prefix": "anchor", "body": "&aname(${1:項目名},option=nolink){}" },
+  "リンク": { "prefix": "link", "body": "[[${1:表示名}>${2:リンク先}]]" },
+  "目次": { "prefix": "contents", "body": "#contents" },
+  "文字色": { "prefix": "color", "body": "&color(${1:red}){${2:文字}}" }
+}

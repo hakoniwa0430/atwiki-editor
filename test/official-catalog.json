@@ -1,0 +1,1186 @@
+[
+  {
+    "name": "logined_mes",
+    "category": "wikiの情報を整理・表示するプラグイン"
+  },
+  {
+    "name": "region",
+    "category": "wikiの情報を整理・表示するプラグイン"
+  },
+  {
+    "name": "endregion",
+    "category": "wikiの情報を整理・表示するプラグイン"
+  },
+  {
+    "name": "exkp",
+    "category": "wikiの情報を整理・表示するプラグイン"
+  },
+  {
+    "name": "exk",
+    "category": "wikiの情報を整理・表示するプラグイン"
+  },
+  {
+    "name": "exp",
+    "category": "wikiの情報を整理・表示するプラグイン"
+  },
+  {
+    "name": "include_by_search",
+    "category": "wikiの情報を整理・表示するプラグイン"
+  },
+  {
+    "name": "link_editmenu2",
+    "category": "wikiの情報を整理・表示するプラグイン"
+  },
+  {
+    "name": "link_editmenu",
+    "category": "wikiの情報を整理・表示するプラグイン"
+  },
+  {
+    "name": "recent",
+    "category": "wikiの情報を整理・表示するプラグイン"
+  },
+  {
+    "name": "recent_child",
+    "category": "wikiの情報を整理・表示するプラグイン"
+  },
+  {
+    "name": "recent_page_ref",
+    "category": "wikiの情報を整理・表示するプラグイン"
+  },
+  {
+    "name": "recent_ref",
+    "category": "wikiの情報を整理・表示するプラグイン"
+  },
+  {
+    "name": "memox",
+    "category": "wikiの情報を整理・表示するプラグイン"
+  },
+  {
+    "name": "this_page",
+    "category": "wikiの情報を整理・表示するプラグイン"
+  },
+  {
+    "name": "this_url",
+    "category": "wikiの情報を整理・表示するプラグイン"
+  },
+  {
+    "name": "pc",
+    "category": "wikiの情報を整理・表示するプラグイン"
+  },
+  {
+    "name": "mobile",
+    "category": "wikiの情報を整理・表示するプラグイン"
+  },
+  {
+    "name": "link_up",
+    "category": "wikiの情報を整理・表示するプラグイン"
+  },
+  {
+    "name": "pulldown_jump",
+    "category": "wikiの情報を整理・表示するプラグイン"
+  },
+  {
+    "name": "link_nourl",
+    "category": "wikiの情報を整理・表示するプラグイン"
+  },
+  {
+    "name": "topicpath",
+    "category": "wikiの情報を整理・表示するプラグイン"
+  },
+  {
+    "name": "navi",
+    "category": "wikiの情報を整理・表示するプラグイン"
+  },
+  {
+    "name": "link_upload",
+    "category": "wikiの情報を整理・表示するプラグイン"
+  },
+  {
+    "name": "furigana",
+    "category": "wikiの情報を整理・表示するプラグイン"
+  },
+  {
+    "name": "memo",
+    "category": "wikiの情報を整理・表示するプラグイン"
+  },
+  {
+    "name": "link_diff",
+    "category": "wikiの情報を整理・表示するプラグイン"
+  },
+  {
+    "name": "forward",
+    "category": "wikiの情報を整理・表示するプラグイン"
+  },
+  {
+    "name": "link_forward",
+    "category": "wikiの情報を整理・表示するプラグイン"
+  },
+  {
+    "name": "back",
+    "category": "wikiの情報を整理・表示するプラグイン"
+  },
+  {
+    "name": "link_back",
+    "category": "wikiの情報を整理・表示するプラグイン"
+  },
+  {
+    "name": "link_rss",
+    "category": "wikiの情報を整理・表示するプラグイン"
+  },
+  {
+    "name": "link_tag",
+    "category": "wikiの情報を整理・表示するプラグイン"
+  },
+  {
+    "name": "link_backup",
+    "category": "wikiの情報を整理・表示するプラグイン"
+  },
+  {
+    "name": "link_ref",
+    "category": "wikiの情報を整理・表示するプラグイン"
+  },
+  {
+    "name": "link_edit",
+    "category": "wikiの情報を整理・表示するプラグイン"
+  },
+  {
+    "name": "tags",
+    "category": "wikiの情報を整理・表示するプラグイン"
+  },
+  {
+    "name": "tags_list",
+    "category": "wikiの情報を整理・表示するプラグイン"
+  },
+  {
+    "name": "new",
+    "category": "wikiの情報を整理・表示するプラグイン"
+  },
+  {
+    "name": "new2",
+    "category": "wikiの情報を整理・表示するプラグイン"
+  },
+  {
+    "name": "new3",
+    "category": "wikiの情報を整理・表示するプラグイン"
+  },
+  {
+    "name": "newimage",
+    "category": "wikiの情報を整理・表示するプラグイン"
+  },
+  {
+    "name": "list_read_only",
+    "category": "wikiの情報を整理・表示するプラグイン"
+  },
+  {
+    "name": "list_write_only",
+    "category": "wikiの情報を整理・表示するプラグイン"
+  },
+  {
+    "name": "list_by_search",
+    "category": "wikiの情報を整理・表示するプラグイン"
+  },
+  {
+    "name": "list_by_tag",
+    "category": "wikiの情報を整理・表示するプラグイン"
+  },
+  {
+    "name": "list_by_tagsearch",
+    "category": "wikiの情報を整理・表示するプラグイン"
+  },
+  {
+    "name": "list_by_tagsearch_cache",
+    "category": "wikiの情報を整理・表示するプラグイン"
+  },
+  {
+    "name": "taglist_by_search",
+    "category": "wikiの情報を整理・表示するプラグイン"
+  },
+  {
+    "name": "tag_cloud",
+    "category": "wikiの情報を整理・表示するプラグイン"
+  },
+  {
+    "name": "contents",
+    "category": "wikiの情報を整理・表示するプラグイン"
+  },
+  {
+    "name": "contents_line",
+    "category": "wikiの情報を整理・表示するプラグイン"
+  },
+  {
+    "name": "popular",
+    "category": "wikiの情報を整理・表示するプラグイン"
+  },
+  {
+    "name": "related",
+    "category": "wikiの情報を整理・表示するプラグイン"
+  },
+  {
+    "name": "include",
+    "category": "wikiの情報を整理・表示するプラグイン"
+  },
+  {
+    "name": "include_cache",
+    "category": "wikiの情報を整理・表示するプラグイン"
+  },
+  {
+    "name": "splitinclude",
+    "category": "wikiの情報を整理・表示するプラグイン"
+  },
+  {
+    "name": "include_random",
+    "category": "wikiの情報を整理・表示するプラグイン"
+  },
+  {
+    "name": "list_newcreated",
+    "category": "wikiの情報を整理・表示するプラグイン"
+  },
+  {
+    "name": "ls",
+    "category": "wikiの情報を整理・表示するプラグイン"
+  },
+  {
+    "name": "lsd",
+    "category": "wikiの情報を整理・表示するプラグイン"
+  },
+  {
+    "name": "ls2",
+    "category": "wikiの情報を整理・表示するプラグイン"
+  },
+  {
+    "name": "ls3",
+    "category": "wikiの情報を整理・表示するプラグイン"
+  },
+  {
+    "name": "ls_line",
+    "category": "wikiの情報を整理・表示するプラグイン"
+  },
+  {
+    "name": "yetlist",
+    "category": "wikiの情報を整理・表示するプラグイン"
+  },
+  {
+    "name": "infobox",
+    "category": "wikiの情報を整理・表示するプラグイン"
+  },
+  {
+    "name": "threads",
+    "category": "wikiの情報を整理・表示するプラグイン"
+  },
+  {
+    "name": "popular_threads",
+    "category": "wikiの情報を整理・表示するプラグイン"
+  },
+  {
+    "name": "thread_posts",
+    "category": "wikiの情報を整理・表示するプラグイン"
+  },
+  {
+    "name": "areaedit",
+    "category": "編集をサポートするプラグイン"
+  },
+  {
+    "name": "tab",
+    "category": "編集をサポートするプラグイン"
+  },
+  {
+    "name": "t",
+    "category": "編集をサポートするプラグイン"
+  },
+  {
+    "name": "footnote",
+    "category": "編集をサポートするプラグイン"
+  },
+  {
+    "name": "sup",
+    "category": "編集をサポートするプラグイン"
+  },
+  {
+    "name": "sub",
+    "category": "編集をサポートするプラグイン"
+  },
+  {
+    "name": "s",
+    "category": "編集をサポートするプラグイン"
+  },
+  {
+    "name": "i",
+    "category": "編集をサポートするプラグイン"
+  },
+  {
+    "name": "small",
+    "category": "編集をサポートするプラグイン"
+  },
+  {
+    "name": "big",
+    "category": "編集をサポートするプラグイン"
+  },
+  {
+    "name": "strong",
+    "category": "編集をサポートするプラグイン"
+  },
+  {
+    "name": "tt",
+    "category": "編集をサポートするプラグイン"
+  },
+  {
+    "name": "table_edit",
+    "category": "編集をサポートするプラグイン"
+  },
+  {
+    "name": "address",
+    "category": "編集をサポートするプラグイン"
+  },
+  {
+    "name": "expand",
+    "category": "編集をサポートするプラグイン"
+  },
+  {
+    "name": "divclass",
+    "category": "編集をサポートするプラグイン"
+  },
+  {
+    "name": "cite",
+    "category": "編集をサポートするプラグイン"
+  },
+  {
+    "name": "q",
+    "category": "編集をサポートするプラグイン"
+  },
+  {
+    "name": "blockquote",
+    "category": "編集をサポートするプラグイン"
+  },
+  {
+    "name": "mark_reg",
+    "category": "編集をサポートするプラグイン"
+  },
+  {
+    "name": "mark_copy",
+    "category": "編集をサポートするプラグイン"
+  },
+  {
+    "name": "nowiki",
+    "category": "編集をサポートするプラグイン"
+  },
+  {
+    "name": "nolink",
+    "category": "編集をサポートするプラグイン"
+  },
+  {
+    "name": "underline",
+    "category": "編集をサポートするプラグイン"
+  },
+  {
+    "name": "u",
+    "category": "編集をサポートするプラグイン"
+  },
+  {
+    "name": "underdot",
+    "category": "編集をサポートするプラグイン"
+  },
+  {
+    "name": "javascript",
+    "category": "編集をサポートするプラグイン"
+  },
+  {
+    "name": "js",
+    "category": "編集をサポートするプラグイン"
+  },
+  {
+    "name": "co",
+    "category": "編集をサポートするプラグイン"
+  },
+  {
+    "name": "swf",
+    "category": "編集をサポートするプラグイン"
+  },
+  {
+    "name": "flash",
+    "category": "編集をサポートするプラグイン"
+  },
+  {
+    "name": "marquee",
+    "category": "編集をサポートするプラグイン"
+  },
+  {
+    "name": "space",
+    "category": "編集をサポートするプラグイン"
+  },
+  {
+    "name": "nbsp",
+    "category": "編集をサポートするプラグイン"
+  },
+  {
+    "name": "spanclass",
+    "category": "編集をサポートするプラグイン"
+  },
+  {
+    "name": "clear",
+    "category": "編集をサポートするプラグイン"
+  },
+  {
+    "name": "highlight",
+    "category": "編集をサポートするプラグイン"
+  },
+  {
+    "name": "codehighlight",
+    "category": "編集をサポートするプラグイン"
+  },
+  {
+    "name": "tex",
+    "category": "編集をサポートするプラグイン"
+  },
+  {
+    "name": "hr",
+    "category": "編集をサポートするプラグイン"
+  },
+  {
+    "name": "br",
+    "category": "編集をサポートするプラグイン"
+  },
+  {
+    "name": "asciiart",
+    "category": "編集をサポートするプラグイン"
+  },
+  {
+    "name": "aa",
+    "category": "編集をサポートするプラグイン"
+  },
+  {
+    "name": "font",
+    "category": "編集をサポートするプラグイン"
+  },
+  {
+    "name": "bgcolor",
+    "category": "編集をサポートするプラグイン"
+  },
+  {
+    "name": "strike",
+    "category": "編集をサポートするプラグイン"
+  },
+  {
+    "name": "right",
+    "category": "編集をサポートするプラグイン"
+  },
+  {
+    "name": "left",
+    "category": "編集をサポートするプラグイン"
+  },
+  {
+    "name": "center",
+    "category": "編集をサポートするプラグイン"
+  },
+  {
+    "name": "bold",
+    "category": "編集をサポートするプラグイン"
+  },
+  {
+    "name": "b",
+    "category": "編集をサポートするプラグイン"
+  },
+  {
+    "name": "nobold",
+    "category": "編集をサポートするプラグイン"
+  },
+  {
+    "name": "color",
+    "category": "編集をサポートするプラグイン"
+  },
+  {
+    "name": "table_style",
+    "category": "編集をサポートするプラグイン"
+  },
+  {
+    "name": "table_color",
+    "category": "編集をサポートするプラグイン"
+  },
+  {
+    "name": "table_zebra",
+    "category": "編集をサポートするプラグイン"
+  },
+  {
+    "name": "table_sorter",
+    "category": "編集をサポートするプラグイン"
+  },
+  {
+    "name": "table_autoincrement",
+    "category": "編集をサポートするプラグイン"
+  },
+  {
+    "name": "table_filter",
+    "category": "編集をサポートするプラグイン"
+  },
+  {
+    "name": "html",
+    "category": "編集をサポートするプラグイン"
+  },
+  {
+    "name": "html2",
+    "category": "編集をサポートするプラグイン"
+  },
+  {
+    "name": "include",
+    "category": "編集をサポートするプラグイン"
+  },
+  {
+    "name": "inc",
+    "category": "編集をサポートするプラグイン"
+  },
+  {
+    "name": "italic",
+    "category": "編集をサポートするプラグイン"
+  },
+  {
+    "name": "size",
+    "category": "編集をサポートするプラグイン"
+  },
+  {
+    "name": "sizex",
+    "category": "編集をサポートするプラグイン"
+  },
+  {
+    "name": "ruby",
+    "category": "編集をサポートするプラグイン"
+  },
+  {
+    "name": "div",
+    "category": "編集をサポートするプラグイン"
+  },
+  {
+    "name": "divid",
+    "category": "編集をサポートするプラグイン"
+  },
+  {
+    "name": "spanid",
+    "category": "編集をサポートするプラグイン"
+  },
+  {
+    "name": "spanstyle",
+    "category": "編集をサポートするプラグイン"
+  },
+  {
+    "name": "style",
+    "category": "編集をサポートするプラグイン"
+  },
+  {
+    "name": "divstyle",
+    "category": "編集をサポートするプラグイン"
+  },
+  {
+    "name": "math",
+    "category": "編集をサポートするプラグイン"
+  },
+  {
+    "name": "icon_fa",
+    "category": "編集をサポートするプラグイン"
+  },
+  {
+    "name": "link",
+    "category": "リンクを表示するプラグイン"
+  },
+  {
+    "name": "link2",
+    "category": "リンクを表示するプラグイン"
+  },
+  {
+    "name": "blanklink",
+    "category": "リンクを表示するプラグイン"
+  },
+  {
+    "name": "anchor",
+    "category": "リンクを表示するプラグイン"
+  },
+  {
+    "name": "aname",
+    "category": "リンクを表示するプラグイン"
+  },
+  {
+    "name": "link_anchor",
+    "category": "リンクを表示するプラグイン"
+  },
+  {
+    "name": "link_aname",
+    "category": "リンクを表示するプラグイン"
+  },
+  {
+    "name": "mailto",
+    "category": "リンクを表示するプラグイン"
+  },
+  {
+    "name": "link_mail",
+    "category": "リンクを表示するプラグイン"
+  },
+  {
+    "name": "tel",
+    "category": "リンクを表示するプラグイン"
+  },
+  {
+    "name": "link_tel",
+    "category": "リンクを表示するプラグイン"
+  },
+  {
+    "name": "link_toppage",
+    "category": "リンクを表示するプラグイン"
+  },
+  {
+    "name": "link_newpage",
+    "category": "リンクを表示するプラグイン"
+  },
+  {
+    "name": "link_chmod",
+    "category": "リンクを表示するプラグイン"
+  },
+  {
+    "name": "link_pagelist",
+    "category": "リンクを表示するプラグイン"
+  },
+  {
+    "name": "link_popular",
+    "category": "リンクを表示するプラグイン"
+  },
+  {
+    "name": "link_contact",
+    "category": "リンクを表示するプラグイン"
+  },
+  {
+    "name": "link_contributor",
+    "category": "リンクを表示するプラグイン"
+  },
+  {
+    "name": "link_parent",
+    "category": "リンクを表示するプラグイン"
+  },
+  {
+    "name": "link_path",
+    "category": "リンクを表示するプラグイン"
+  },
+  {
+    "name": "link_pdf",
+    "category": "リンクを表示するプラグイン"
+  },
+  {
+    "name": "linklist",
+    "category": "リンクを表示するプラグイン"
+  },
+  {
+    "name": "random",
+    "category": "リンクを表示するプラグイン"
+  },
+  {
+    "name": "random2",
+    "category": "リンクを表示するプラグイン"
+  },
+  {
+    "name": "random3",
+    "category": "リンクを表示するプラグイン"
+  },
+  {
+    "name": "random_page",
+    "category": "リンクを表示するプラグイン"
+  },
+  {
+    "name": "back",
+    "category": "リンクを表示するプラグイン"
+  },
+  {
+    "name": "favorite",
+    "category": "リンクを表示するプラグイン"
+  },
+  {
+    "name": "link_atwiki",
+    "category": "リンクを表示するプラグイン"
+  },
+  {
+    "name": "link_wikipedia",
+    "category": "リンクを表示するプラグイン"
+  },
+  {
+    "name": "link_displaymode",
+    "category": "リンクを表示するプラグイン"
+  },
+  {
+    "name": "twitter_widget_profile2",
+    "category": "情報を集めるプラグイン"
+  },
+  {
+    "name": "twitter_widget3",
+    "category": "情報を集めるプラグイン"
+  },
+  {
+    "name": "instagram_widget",
+    "category": "情報を集めるプラグイン"
+  },
+  {
+    "name": "discord_widget",
+    "category": "情報を集めるプラグイン"
+  },
+  {
+    "name": "showrss",
+    "category": "情報を集めるプラグイン"
+  },
+  {
+    "name": "rss",
+    "category": "情報を集めるプラグイン"
+  },
+  {
+    "name": "feedreader",
+    "category": "情報を集めるプラグイン"
+  },
+  {
+    "name": "news",
+    "category": "情報を集めるプラグイン"
+  },
+  {
+    "name": "gnews",
+    "category": "情報を集めるプラグイン"
+  },
+  {
+    "name": "search_plugin",
+    "category": "フォームを設置するプラグイン"
+  },
+  {
+    "name": "newpage",
+    "category": "フォームを設置するプラグイン"
+  },
+  {
+    "name": "loginform",
+    "category": "フォームを設置するプラグイン"
+  },
+  {
+    "name": "mailform",
+    "category": "フォームを設置するプラグイン"
+  },
+  {
+    "name": "search",
+    "category": "フォームを設置するプラグイン"
+  },
+  {
+    "name": "search2",
+    "category": "フォームを設置するプラグイン"
+  },
+  {
+    "name": "search3",
+    "category": "フォームを設置するプラグイン"
+  },
+  {
+    "name": "tagsearch",
+    "category": "フォームを設置するプラグイン"
+  },
+  {
+    "name": "tagsearch2",
+    "category": "フォームを設置するプラグイン"
+  },
+  {
+    "name": "google",
+    "category": "フォームを設置するプラグイン"
+  },
+  {
+    "name": "comment",
+    "category": "フォームを設置するプラグイン"
+  },
+  {
+    "name": "comment_num",
+    "category": "フォームを設置するプラグイン"
+  },
+  {
+    "name": "comment_num2",
+    "category": "フォームを設置するプラグイン"
+  },
+  {
+    "name": "pcomment",
+    "category": "フォームを設置するプラグイン"
+  },
+  {
+    "name": "vote",
+    "category": "フォームを設置するプラグイン"
+  },
+  {
+    "name": "vote2",
+    "category": "フォームを設置するプラグイン"
+  },
+  {
+    "name": "vote3",
+    "category": "フォームを設置するプラグイン"
+  },
+  {
+    "name": "tvote",
+    "category": "フォームを設置するプラグイン"
+  },
+  {
+    "name": "irc",
+    "category": "フォームを設置するプラグイン"
+  },
+  {
+    "name": "image",
+    "category": "画像系プラグイン"
+  },
+  {
+    "name": "ref",
+    "category": "画像系プラグイン"
+  },
+  {
+    "name": "blankimg",
+    "category": "画像系プラグイン"
+  },
+  {
+    "name": "random_img",
+    "category": "画像系プラグイン"
+  },
+  {
+    "name": "lightbox",
+    "category": "画像系プラグイン"
+  },
+  {
+    "name": "pixiv",
+    "category": "画像系プラグイン"
+  },
+  {
+    "name": "gyazo",
+    "category": "画像系プラグイン"
+  },
+  {
+    "name": "slide_img",
+    "category": "画像系プラグイン"
+  },
+  {
+    "name": "img_slide",
+    "category": "画像系プラグイン"
+  },
+  {
+    "name": "mp3blestar",
+    "category": "音声系プラグイン"
+  },
+  {
+    "name": "soundcloud_widget",
+    "category": "音声系プラグイン"
+  },
+  {
+    "name": "nicovideo2",
+    "category": "動画系プラグイン"
+  },
+  {
+    "name": "gametrailers",
+    "category": "動画系プラグイン"
+  },
+  {
+    "name": "jumpcut",
+    "category": "動画系プラグイン"
+  },
+  {
+    "name": "minakuru_video",
+    "category": "動画系プラグイン"
+  },
+  {
+    "name": "im_vlog",
+    "category": "動画系プラグイン"
+  },
+  {
+    "name": "nifty_video",
+    "category": "動画系プラグイン"
+  },
+  {
+    "name": "dailymotion2",
+    "category": "動画系プラグイン"
+  },
+  {
+    "name": "veoh",
+    "category": "動画系プラグイン"
+  },
+  {
+    "name": "video",
+    "category": "動画系プラグイン"
+  },
+  {
+    "name": "nicovideo_com",
+    "category": "動画系プラグイン"
+  },
+  {
+    "name": "nicovideo_mylist",
+    "category": "動画系プラグイン"
+  },
+  {
+    "name": "nicovideo_series",
+    "category": "動画系プラグイン"
+  },
+  {
+    "name": "nicovideo",
+    "category": "動画系プラグイン"
+  },
+  {
+    "name": "youtube",
+    "category": "動画系プラグイン"
+  },
+  {
+    "name": "u2b",
+    "category": "動画系プラグイン"
+  },
+  {
+    "name": "jimakuin",
+    "category": "動画系プラグイン"
+  },
+  {
+    "name": "mncast",
+    "category": "動画系プラグイン"
+  },
+  {
+    "name": "now",
+    "category": "カウンター・時間表示系プラグイン"
+  },
+  {
+    "name": "fclock",
+    "category": "カウンター・時間表示系プラグイン"
+  },
+  {
+    "name": "date",
+    "category": "カウンター・時間表示系プラグイン"
+  },
+  {
+    "name": "time",
+    "category": "カウンター・時間表示系プラグイン"
+  },
+  {
+    "name": "update",
+    "category": "カウンター・時間表示系プラグイン"
+  },
+  {
+    "name": "last_modified",
+    "category": "カウンター・時間表示系プラグイン"
+  },
+  {
+    "name": "lastmod",
+    "category": "カウンター・時間表示系プラグイン"
+  },
+  {
+    "name": "today",
+    "category": "カウンター・時間表示系プラグイン"
+  },
+  {
+    "name": "calendar",
+    "category": "カウンター・時間表示系プラグイン"
+  },
+  {
+    "name": "counter",
+    "category": "カウンター・時間表示系プラグイン"
+  },
+  {
+    "name": "count_members",
+    "category": "カウンター・時間表示系プラグイン"
+  },
+  {
+    "name": "hatena_b_counter",
+    "category": "カウンター・時間表示系プラグイン"
+  },
+  {
+    "name": "countdown",
+    "category": "カウンター・時間表示系プラグイン"
+  },
+  {
+    "name": "countup",
+    "category": "カウンター・時間表示系プラグイン"
+  },
+  {
+    "name": "bookmark_yahoo",
+    "category": "ブックマークプラグイン"
+  },
+  {
+    "name": "bookmark_sphere",
+    "category": "ブックマークプラグイン"
+  },
+  {
+    "name": "bookmark_blogmarks",
+    "category": "ブックマークプラグイン"
+  },
+  {
+    "name": "bookmark_technorati",
+    "category": "ブックマークプラグイン"
+  },
+  {
+    "name": "bookmark_buzzurl",
+    "category": "ブックマークプラグイン"
+  },
+  {
+    "name": "bookmark_pookmark",
+    "category": "ブックマークプラグイン"
+  },
+  {
+    "name": "favorite",
+    "category": "ブックマークプラグイン"
+  },
+  {
+    "name": "homepage",
+    "category": "ブックマークプラグイン"
+  },
+  {
+    "name": "amazon",
+    "category": "アフィリエイトをサポートするプラグイン"
+  },
+  {
+    "name": "amazon2",
+    "category": "アフィリエイトをサポートするプラグイン"
+  },
+  {
+    "name": "mikunano",
+    "category": "ブログパーツプラグイン"
+  },
+  {
+    "name": "fullmiku",
+    "category": "ブログパーツプラグイン"
+  },
+  {
+    "name": "flipbook_in",
+    "category": "その他・未分類プラグイン"
+  },
+  {
+    "name": "online",
+    "category": "その他・未分類プラグイン"
+  },
+  {
+    "name": "wikiname",
+    "category": "その他・未分類プラグイン"
+  },
+  {
+    "name": "wikiurl",
+    "category": "その他・未分類プラグイン"
+  },
+  {
+    "name": "google_calendar",
+    "category": "その他・未分類プラグイン"
+  },
+  {
+    "name": "include_js",
+    "category": "その他・未分類プラグイン"
+  },
+  {
+    "name": "tooltip",
+    "category": "その他・未分類プラグイン"
+  },
+  {
+    "name": "seibun",
+    "category": "その他・未分類プラグイン"
+  },
+  {
+    "name": "reload",
+    "category": "その他・未分類プラグイン"
+  },
+  {
+    "name": "count_pages",
+    "category": "その他・未分類プラグイン"
+  },
+  {
+    "name": "slideshare",
+    "category": "その他・未分類プラグイン"
+  },
+  {
+    "name": "gaugeset",
+    "category": "その他・未分類プラグイン"
+  },
+  {
+    "name": "gauge",
+    "category": "その他・未分類プラグイン"
+  },
+  {
+    "name": "googlemaps",
+    "category": "その他・未分類プラグイン"
+  },
+  {
+    "name": "googlespreadsheets",
+    "category": "その他・未分類プラグイン"
+  },
+  {
+    "name": "google_spsheet",
+    "category": "その他・未分類プラグイン"
+  },
+  {
+    "name": "googlespreadsheets2",
+    "category": "その他・未分類プラグイン"
+  },
+  {
+    "name": "googlespreadsheets3",
+    "category": "その他・未分類プラグイン"
+  },
+  {
+    "name": "count_childpages",
+    "category": "その他・未分類プラグイン"
+  },
+  {
+    "name": "listbox",
+    "category": "その他・未分類プラグイン"
+  },
+  {
+    "name": "hiduke",
+    "category": "その他・未分類プラグイン"
+  },
+  {
+    "name": "setpagename",
+    "category": "その他・未分類プラグイン"
+  },
+  {
+    "name": "settitle",
+    "category": "その他・未分類プラグイン"
+  },
+  {
+    "name": "redirect",
+    "category": "その他・未分類プラグイン"
+  },
+  {
+    "name": "nomenu",
+    "category": "その他・未分類プラグイン"
+  },
+  {
+    "name": "nomenu2",
+    "category": "その他・未分類プラグイン"
+  },
+  {
+    "name": "setmenu",
+    "category": "その他・未分類プラグイン"
+  },
+  {
+    "name": "setmenu2",
+    "category": "その他・未分類プラグイン"
+  },
+  {
+    "name": "arrow",
+    "category": "その他・未分類プラグイン"
+  },
+  {
+    "name": "hatena_star",
+    "category": "その他・未分類プラグイン"
+  },
+  {
+    "name": "presen",
+    "category": "その他・未分類プラグイン"
+  },
+  {
+    "name": "qr",
+    "category": "その他・未分類プラグイン"
+  },
+  {
+    "name": "treemenu",
+    "category": "その他・未分類プラグイン"
+  },
+  {
+    "name": "treemenu2",
+    "category": "その他・未分類プラグイン"
+  },
+  {
+    "name": "treemenu3",
+    "category": "その他・未分類プラグイン"
+  },
+  {
+    "name": "openclose",
+    "category": "その他・未分類プラグイン"
+  },
+  {
+    "name": "openclose2",
+    "category": "その他・未分類プラグイン"
+  },
+  {
+    "name": "calc",
+    "category": "その他・未分類プラグイン"
+  },
+  {
+    "name": "facebook_like",
+    "category": "その他・未分類プラグイン"
+  }
+]

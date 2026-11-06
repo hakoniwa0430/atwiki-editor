@@ -1,0 +1,27 @@
+Third-party components used for offline rendering
+
+KaTeX 0.18.2, MIT, https://github.com/KaTeX/KaTeX/tree/v0.18.2
+JS/CSS/woff2 fonts and LICENSE copied from the official katex@0.18.2 npm package.
+Retrieved 2026-11-06. dist/katex.min.js is stored as vendor/katex/katex-bundle.js.
+License: KATEX-LICENSE.txt. JS and font files remain unmodified.
+CSS removes woff/ttf fallback references: the bundled woff2 fonts are used.
+
+highlight.js 11.11.1 common build, BSD-3-Clause
+https://github.com/highlightjs/cdn-release/tree/11.11.1/build
+License: HIGHLIGHT-LICENSE.txt. No source modifications.
+
+QR Code Generator by Kazuhiko Arase, MIT
+https://github.com/kazuhikoarase/qrcode-generator/blob/master/js/dist/qrcode.js
+Retrieved 2026-11-01. License: QRCODE-LICENSE.txt.
+Renderer selects UTF-8 byte encoding via the library's stringToBytes hook.
+
+Font Awesome Free 6.7.2, Fonticons, Inc.
+https://github.com/FortAwesome/Font-Awesome/tree/6.7.2
+Icons CC BY 4.0: https://creativecommons.org/licenses/by/4.0/
+Code MIT. See FONT-AWESOME-LICENSE.txt.
+icons.json extracts SVG data from js/solid.js, js/regular.js, js/brands.js,
+and indexes their string aliases. old-republic uses the unmodified official
+svgs/brands/old-republic.svg from tag 6.7.2, retrieved 2026-11-06 and preserved
+as vendor/old-republic.svg. Other icon geometry is unmodified. Font Awesome Pro icons are not included.
+
+media/icons/quote-left.svg uses the Font Awesome Free 6.7.2 solid quote-left geometry from icons.json (CC BY 4.0, see FONT-AWESOME-LICENSE.txt); display size 24px and fill #d9d9d9 added. It approximates the unavailable AtWiki quote decoration.

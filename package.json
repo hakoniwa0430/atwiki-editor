@@ -1,0 +1,242 @@
+{
+  "name": "atwiki-local-preview",
+  "displayName": "Atwiki Editor",
+  "description": "アットウィキ記法をオフラインで編集・ライブプレビューする拡張機能",
+  "version": "1.0.0",
+  "publisher": "atwiki-local-tools",
+  "license": "MIT",
+  "engines": {
+    "vscode": "^1.85.0"
+  },
+  "categories": [
+    "Visualization",
+    "Programming Languages"
+  ],
+  "keywords": [
+    "atwiki",
+    "wiki",
+    "preview",
+    "アットウィキ"
+  ],
+  "main": "./src/extension.js",
+  "capabilities": {
+    "untrustedWorkspaces": {
+      "supported": true
+    },
+    "virtualWorkspaces": true
+  },
+  "contributes": {
+    "languages": [
+      {
+        "id": "atwiki",
+        "aliases": [
+          "アットウィキ",
+          "AtWiki"
+        ],
+        "extensions": [
+          ".atwiki",
+          ".atw"
+        ],
+        "configuration": "./language-configuration.json",
+        "icon": {
+          "light": "./media/icons/atwiki-light.svg",
+          "dark": "./media/icons/atwiki-dark.svg"
+        }
+      }
+    ],
+    "grammars": [
+      {
+        "language": "atwiki",
+        "scopeName": "text.atwiki",
+        "path": "./syntaxes/atwiki.tmLanguage.json"
+      }
+    ],
+    "snippets": [
+      {
+        "language": "atwiki",
+        "path": "./snippets/atwiki.json"
+      }
+    ],
+    "commands": [
+      {
+        "command": "atwiki.autoLinkPageNames",
+        "title": "アットウィキ: ページ名の自動リンクを実行（現在の本文）",
+        "icon": "$(link)"
+      },
+      {
+        "command": "atwiki.openPreview",
+        "title": "アットウィキ: プレビューを横に開く",
+        "icon": "$(open-preview)"
+      },
+      {
+        "command": "atwiki.saveSnapshot",
+        "title": "アットウィキ: 現在の状態を保存",
+        "icon": "$(save)"
+      },
+      {
+        "command": "atwiki.compareSnapshot",
+        "title": "アットウィキ: 最新の保存状態と比較",
+        "icon": "$(diff)"
+      },
+      {
+        "command": "atwiki.selectSnapshot",
+        "title": "アットウィキ: 履歴を選んで比較",
+        "icon": "$(history)"
+      },
+      {
+        "command": "atwiki.restoreSnapshot",
+        "title": "アットウィキ: 履歴から復元",
+        "icon": "$(discard)"
+      }
+    ],
+    "menus": {
+      "editor/title": [
+        {
+          "command": "atwiki.openPreview",
+          "when": "editorLangId == atwiki",
+          "group": "navigation"
+        },
+        {
+          "command": "atwiki.saveSnapshot",
+          "when": "editorLangId == atwiki || editorLangId == plaintext",
+          "group": "navigation"
+        },
+        {
+          "command": "atwiki.compareSnapshot",
+          "when": "editorLangId == atwiki || editorLangId == plaintext",
+          "group": "navigation"
+        },
+        {
+          "command": "atwiki.restoreSnapshot",
+          "when": "(editorLangId == atwiki || editorLangId == plaintext) && resourceScheme == file",
+          "group": "navigation"
+        }
+      ],
+      "editor/context": [
+        {
+          "command": "atwiki.autoLinkPageNames",
+          "when": "(editorLangId == atwiki || editorLangId == plaintext) && resourceScheme == file",
+          "group": "atwikiLinks"
+        },
+        {
+          "command": "atwiki.openPreview",
+          "when": "editorLangId == atwiki || editorLangId == plaintext",
+          "group": "navigation"
+        },
+        {
+          "command": "atwiki.saveSnapshot",
+          "when": "editorLangId == atwiki || editorLangId == plaintext",
+          "group": "atwikiSnapshots"
+        },
+        {
+          "command": "atwiki.compareSnapshot",
+          "when": "editorLangId == atwiki || editorLangId == plaintext",
+          "group": "atwikiSnapshots"
+        },
+        {
+          "command": "atwiki.selectSnapshot",
+          "when": "editorLangId == atwiki || editorLangId == plaintext",
+          "group": "atwikiSnapshots"
+        },
+        {
+          "command": "atwiki.restoreSnapshot",
+          "when": "(editorLangId == atwiki || editorLangId == plaintext) && resourceScheme == file",
+          "group": "atwikiSnapshots"
+        }
+      ]
+    },
+    "keybindings": [
+      {
+        "command": "atwiki.openPreview",
+        "key": "ctrl+alt+v",
+        "mac": "cmd+alt+v",
+        "when": "editorTextFocus && editorLangId == atwiki"
+      }
+    ],
+    "configuration": {
+      "title": "Atwiki Editor",
+      "properties": {
+        "atwiki.autoLink.excludedPages": {
+          "type": "array",
+          "items": { "type": "string" },
+          "default": [],
+          "description": "ページ名の自動リンクから除外するローカルページ名（拡張子なし）。初期ページや非公開ページなどを指定します。"
+        },
+        "atwiki.preview.wikiName": {
+          "type": "string",
+          "default": "ローカルWiki",
+          "description": "wikiname に表示するウィキ名。"
+        },
+        "atwiki.preview.wikiUrl": {
+          "type": "string",
+          "default": "",
+          "description": "wikiurl に表示するウィキのURL。"
+        },
+        "atwiki.preview.allowSharedImages": {
+          "type": "boolean",
+          "default": true,
+          "description": "ウィキ内共通利用ファイル管理の画像URL（img.atwiki.jp の /pub/）をHTTPSで読み込みます。旧画像URLも対応します。"
+        },
+        "atwiki.preview.allowRemoteImages": {
+          "type": "boolean",
+          "default": false,
+          "description": "HTTPS の外部画像全般を読み込みます。共通利用ファイルの画像は allowSharedImages でも個別に許可できます。"
+        },
+        "atwiki.preview.displayMode": {
+          "type": "string",
+          "enum": [
+            "desktop",
+            "mobile"
+          ],
+          "default": "desktop",
+          "description": "pc / mobile などの条件付き記法を確認するための表示モード。"
+        },
+        "atwiki.preview.theme": {
+          "type": "string",
+          "enum": [
+            "uikit",
+            "paper",
+            "editor"
+          ],
+          "default": "uikit",
+          "description": "uikit は Uikit レスポンシブに寄せた本文表示、paper は従来の用紙、editor は VS Code の配色です。"
+        },
+        "atwiki.preview.updateDelay": {
+          "type": "number",
+          "default": 200,
+          "minimum": 0,
+          "maximum": 2000,
+          "description": "入力から再描画までの待機時間（ミリ秒）。"
+        },
+        "atwiki.preview.syncScroll": {
+          "type": "boolean",
+          "default": true,
+          "description": "エディターのスクロール位置をプレビューに反映します。"
+        },
+        "atwiki.preview.allowExternalEmbeds": {
+          "type": "boolean",
+          "default": false,
+          "description": "YouTube・ニコニコ動画・X・Discordの埋め込みを取得します。表示すると外部サービスへ接続します。"
+        },
+        "atwiki.preview.allowExternalFeeds": {
+          "type": "boolean",
+          "default": false,
+          "description": "公開HTTPSのRSS/Atomを取得します。最大4フィード・各512KB、60秒キャッシュ。HTTP指定はHTTPSへ変換します。"
+        }
+      }
+    }
+  },
+  "scripts": {
+    "test": "node --test test/*.test.js",
+    "check": "node scripts/check.js",
+    "audit": "node scripts/audit.js",
+    "package": "node scripts/package.js",
+    "format": "prettier --write \"src/**/*.js\" \"media/*.js\" \"media/interactions/*.js\" \"scripts/*.js\" \"test/*.test.js\"",
+    "format:check": "prettier --check \"src/**/*.js\" \"media/*.js\" \"media/interactions/*.js\" \"scripts/*.js\" \"test/*.test.js\"",
+    "audit:write": "node scripts/audit.js --write"
+  },
+  "icon": "media/icons/extension.png",
+  "devDependencies": {
+    "prettier": "3.6.2"
+  }
+}

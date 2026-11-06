@@ -1,0 +1,40 @@
+#contents
+*表の装飾と操作 [#table-demo]
+#table_filter(){備考=show}
+#table_style(head=#e0eaff:bold,hover=#fff5cc){価格=right}
+|~商品|~価格|~備考|
+|果物|1,200|&color(red){おすすめ}|
+|飲料|300|在庫あり|
+|>|セット商品|横結合|
+|>|~|縦結合|
+#table_sorter(){zebra=1}
+#table_autoincrement(){label=番号,start=1}
+*装飾・脚注 [#text-demo]
+&ruby(よみがな){漢字} &font(b,u,18px,navy){複合装飾}
+脚注を確認します。((ここが脚注の本文です。))
+&icon_fa(fas fa-house) &icon_fa(far fa-envelope) &icon_fa(fab fa-github)
+[[表へ戻る>#table-demo]]
+*折りたたみと吹き出し [#toggle-demo]
+#region(open,開いた折りたたみ)
+&openclose2(show=詳細){インラインで開閉する本文です。}
+&infobox(title=クリックして説明,gravity=north,size=medium){吹き出しの本文です。}
+#endregion
+#treemenu(title=ページ案内,[[表>#table-demo]],[[数式>#math-demo]])
+*数式とコード [#math-demo]
+#math(){{{
+\frac{1}{2}+\sqrt{x^2+y^2}
+}}}
+#highlight(javascript,linenumber){{{
+function total(price, count) {
+  return price * count;
+}
+}}}
+*その他の表示 [#widgets-demo]
+&pc(){PCモードで表示します。}&mobile(){携帯モードで表示します。}
+&link_displaymode()
+#gaugeset(limit=10,char=■,col1=#287dcc,col2=#e6a62d)
+&gauge(6,2)
+#calc()
+#qr(https://w.atwiki.jp/guide/)
+#calendar()
+#presen(incremental)
