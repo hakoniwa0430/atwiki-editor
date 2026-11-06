@@ -2,7 +2,7 @@
 
 ## インストール
 
-VS Code 1.85.0 以降で利用できます。配布された `atwiki-local-preview-1.0.0.vsix` を用意し、拡張機能画面の「…」→「VSIX からのインストール…」で選択します。この方法ではNode.jsとnpmは不要です。
+VS Code 1.85.0 以降で利用できます。配布された `atwiki-editor-1.0.0.vsix` を用意し、拡張機能画面の「…」→「VSIX からのインストール…」で選択します。この方法ではNode.jsとnpmは不要です。
 
 配布ファイルは[GitHub Releases](https://github.com/hakoniwa0430/atwiki-editor/releases)に掲載されている場合にダウンロードできます。
 
@@ -12,7 +12,7 @@ Node.js と npm を用意し、リポジトリのルートで VSIX を生成し�
 
 ```sh
 npm run package
-code --install-extension atwiki-local-preview-1.0.0.vsix
+code --install-extension atwiki-editor-1.0.0.vsix
 ```
 
 ### 既存バージョンの入れ替え
@@ -20,7 +20,7 @@ code --install-extension atwiki-local-preview-1.0.0.vsix
 同じ拡張機能ID（`atwiki-local-tools.atwiki-local-preview`）のバージョンを入れ替える場合は、次のコマンドでVSIXを指定します。`code` コマンドを利用できない環境では、拡張機能画面から「VSIX からのインストール…」を選んでください。
 
 ```sh
-code --install-extension atwiki-local-preview-1.0.0.vsix --force
+code --install-extension atwiki-editor-1.0.0.vsix --force
 ```
 
 ## 使い方

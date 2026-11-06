@@ -96,7 +96,7 @@ end.writeUInt16LE(entries.length, 8);
 end.writeUInt16LE(entries.length, 10);
 end.writeUInt32LE(directory.length, 12);
 end.writeUInt32LE(offset, 16);
-const output = path.join(root, `${pkg.name}-${pkg.version}.vsix`);
+const output = path.join(root, `atwiki-editor-${pkg.version}.vsix`);
 fs.writeFileSync(output, Buffer.concat([...local, directory, end]));
 console.log(
   `Created ${path.basename(output)} (${entries.length} files, ${fs.statSync(output).size} bytes)`,

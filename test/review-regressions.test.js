@@ -167,7 +167,7 @@ test('VSIX includes only the distributed samples, not personal output documents'
     await fs.writeFile(path.join(root, file), 'fixture');
   execFileSync(process.execPath, [path.join(root, 'scripts/package.js')]);
   const pkg = require('../package.json');
-  const archive = await fs.readFile(path.join(root, `${pkg.name}-${pkg.version}.vsix`));
+  const archive = await fs.readFile(path.join(root, `atwiki-editor-${pkg.version}.vsix`));
   const names = [];
   let offset = 0;
   while (archive.readUInt32LE(offset) === 0x04034b50) {
