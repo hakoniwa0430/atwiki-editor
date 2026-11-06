@@ -5,6 +5,14 @@
   "version": "1.0.0",
   "publisher": "atwiki-local-tools",
   "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/hakoniwa0430/atwiki-editor.git"
+  },
+  "homepage": "https://github.com/hakoniwa0430/atwiki-editor#readme",
+  "bugs": {
+    "url": "https://github.com/hakoniwa0430/atwiki-editor/issues"
+  },
   "engines": {
     "vscode": "^1.85.0"
   },

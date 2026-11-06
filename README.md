@@ -1,17 +1,19 @@
 # Atwiki Editor
 
-アットウィキ記法の編集・ライブプレビューに対応した非公式の VS Code 拡張機能です。対象は VS Code 1.85.0 以降。開発には Node.js と npm を使用します。
+アットウィキ記法の編集・ライブプレビューに対応した非公式の VS Code 拡張機能です。対象は VS Code 1.85.0 以降です。
 
 ## インストール
 
-リポジトリのルートで以下を実行します。VSIXの生成にはNode.jsとnpmが必要です。実行時ライブラリは同梱済みのため、生成前の `npm ci` は不要です。
+配布された `atwiki-local-preview-1.0.0.vsix` を、VS Codeの拡張機能画面の「…」→「VSIXからのインストール…」で選びます。VSIXからの導入にはNode.jsやnpmは不要です。配布ファイルは[GitHub Releases](https://github.com/hakoniwa0430/atwiki-editor/releases)に掲載されている場合にダウンロードできます。
+
+ソースから生成する場合は、Node.jsとnpmを用意してリポジトリのルートで以下を実行します。実行時ライブラリは同梱済みのため、生成前の `npm ci` は不要です。
 
 ```sh
 npm run package
 code --install-extension atwiki-local-preview-1.0.0.vsix
 ```
 
-生成済みのVSIXがある場合は、VS Codeの拡張機能画面の「…」→「VSIXからのインストール…」からファイルを選んでもインストールできます。使い方は[インストールと使い方](docs/getting-started.md)を参照してください。
+使い方は[インストールと使い方](docs/getting-started.md)を参照してください。本家アットウィキの完全互換ではありません。外部コンテンツの通信設定と埋め込みの制限は[設定](docs/settings.md)および[リリースノート](docs/release-notes.md)に記載しています。
 
 ## 開発
 
@@ -42,3 +44,7 @@ npm run audit
 ## ライセンス
 
 本体は [MIT License](LICENSE) です。同梱ライブラリのライセンスと由来は `vendor/` 内の `*-LICENSE.txt` および [PROVENANCE.txt](vendor/PROVENANCE.txt) を参照してください。
+
+## 不具合報告
+
+[GitHub Issues](https://github.com/hakoniwa0430/atwiki-editor/issues)に、OS・VS Codeと拡張機能のバージョン・再現手順・期待する表示と実際の表示を記載してください。再現用のWiki記法は、個人情報や非公開情報を除いた最小限の内容にしてください。
