@@ -2,15 +2,16 @@
 
 ## インストール
 
-VS Code 1.85.0 以降で利用できます。配布された `atwiki-editor-1.0.0.vsix` を用意し、拡張機能画面の「…」→「VSIX からのインストール…」で選択します。この方法ではNode.jsとnpmは不要です。
+VS Code 1.92.0 以降で利用できます。配布された `atwiki-editor-1.0.0.vsix` を用意し、拡張機能画面の「…」→「VSIX からのインストール…」で選択します。この方法ではNode.jsとnpmは不要です。VSIXは生成した環境のOS・CPU向けです。
 
 配布ファイルは[GitHub Releases](https://github.com/hakoniwa0430/atwiki-editor/releases)に掲載されている場合にダウンロードできます。
 
 ### ソースから生成する場合
 
-Node.js と npm を用意し、リポジトリのルートで VSIX を生成します。実行時ライブラリは同梱しているため、パッケージ生成に `npm ci` は不要です。
+Node.js 20.9以降とnpmを用意し、利用するOS・CPUの環境で、リポジトリのルートからVSIXを生成します。WebP変換用の実行時ライブラリを先にインストールしてください。
 
 ```sh
+npm ci
 npm run package
 code --install-extension atwiki-editor-1.0.0.vsix
 ```

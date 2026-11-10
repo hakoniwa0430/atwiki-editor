@@ -1,5 +1,5 @@
 'use strict';
-// Dependency-free OPC/VSIX packaging for offline development.
+// OPC/VSIX packaging, including installed runtime dependencies for this platform.
 const fs = require('node:fs');
 const path = require('node:path');
 const { deflateRawSync } = require('node:zlib');
@@ -36,6 +36,27 @@ for (const file of [
   'output/拡張記法サンプル.txt',
 ])
   include(file);
+// Keep native image codecs and their licenses, but exclude development dependencies.
+const runtimePackages = new Set();
+function includeDependency(name, optional = false) {
+  if (runtimePackages.has(name)) return;
+  const relative = `node_modules/${name}`;
+  const manifest = path.join(root, relative, 'package.json');
+  if (!fs.existsSync(manifest)) {
+    if (optional) return;
+    throw Error(`Missing runtime dependency ${name}; run npm ci first.`);
+  }
+  runtimePackages.add(name);
+  const dependency = JSON.parse(fs.readFileSync(manifest, 'utf8'));
+  include(relative);
+  for (const child of Object.keys(dependency.dependencies || {})) includeDependency(child);
+  for (const child of Object.keys(dependency.optionalDependencies || {}))
+    includeDependency(child, true);
+}
+for (const name of Object.keys(pkg.dependencies || {})) includeDependency(name);
+// Fail packaging rather than ship a VSIX with an absent or incompatible native codec.
+require(path.join(root, 'node_modules/sharp'));
+const targetPlatform = `${process.platform === 'linux' && !process.report.getReport().header.glibcVersionRuntime ? 'alpine' : process.platform}-${process.arch}`;
 add(
   '[Content_Types].xml',
   `<?xml version="1.0" encoding="utf-8"?><Types xmlns="http://schemas.openxmlformats.org/package/2006/content-types"><Default Extension="json" ContentType="application/json"/><Default Extension="js" ContentType="application/javascript"/><Default Extension="css" ContentType="text/css"/><Default Extension="woff2" ContentType="font/woff2"/><Default Extension="svg" ContentType="image/svg+xml"/><Default Extension="png" ContentType="image/png"/><Default Extension="md" ContentType="text/markdown"/><Default Extension="txt" ContentType="text/plain"/><Default Extension="vsixmanifest" ContentType="text/xml"/><Override PartName="/extension/LICENSE" ContentType="text/plain"/></Types>`,
@@ -47,6 +68,12 @@ add(
 <Metadata><Identity Language="en-US" Id="${xml(pkg.name)}" Version="${xml(pkg.version)}" Publisher="${xml(pkg.publisher)}"/><DisplayName>${xml(pkg.displayName)}</DisplayName><Description xml:space="preserve">${xml(pkg.description)}</Description><Tags>${xml(pkg.keywords.join(','))}</Tags><Categories>${xml(pkg.categories.join(','))}</Categories><GalleryFlags>Public</GalleryFlags><Properties><Property Id="Microsoft.VisualStudio.Code.Engine" Value="${xml(pkg.engines.vscode)}"/><Property Id="Microsoft.VisualStudio.Code.ExtensionDependencies" Value=""/><Property Id="Microsoft.VisualStudio.Code.ExtensionPack" Value=""/><Property Id="Microsoft.VisualStudio.Code.LocalizedLanguages" Value=""/><Property Id="Microsoft.VisualStudio.Code.EnabledApiProposals" Value=""/><Property Id="Microsoft.VisualStudio.Code.PreRelease" Value="false"/></Properties><License>extension/LICENSE</License>${pkg.icon ? `<Icon>extension/${xml(pkg.icon)}</Icon>` : ''}</Metadata>
 <Installation><InstallationTarget Id="Microsoft.VisualStudio.Code"/></Installation><Dependencies/>
 <Assets>${pkg.icon ? `<Asset Type="Microsoft.VisualStudio.Services.Icons.Default" Path="extension/${xml(pkg.icon)}" Addressable="true"/>` : ''}<Asset Type="Microsoft.VisualStudio.Code.Manifest" Path="extension/package.json" Addressable="true"/><Asset Type="Microsoft.VisualStudio.Services.Content.Details" Path="extension/README.md" Addressable="true"/><Asset Type="Microsoft.VisualStudio.Services.Content.License" Path="extension/LICENSE" Addressable="true"/></Assets></PackageManifest>`,
+);
+const manifestEntry = entries.find((entry) => entry.name === 'extension.vsixmanifest');
+manifestEntry.data = Buffer.from(
+  manifestEntry.data
+    .toString()
+    .replace('<Identity ', `<Identity TargetPlatform="${xml(targetPlatform)}" `),
 );
 function crc32(buffer) {
   let crc = 0xffffffff;

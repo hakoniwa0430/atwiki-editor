@@ -7,6 +7,7 @@ const { loadPages, resolvePage, loadScripts } = require('./local-pages');
 
 function activate(context) {
   require('./snapshots').registerSnapshots(vscode, context);
+  require('./webp-conversion').registerWebp(vscode, context);
   const previews = new Map();
   const pageRoots = new Map();
   const index = new PageIndex({

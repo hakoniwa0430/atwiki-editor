@@ -154,6 +154,7 @@ test('VSIX includes only the distributed samples, not personal output documents'
     await fs.mkdir(path.join(root, dir));
   await fs.copyFile('scripts/package.js', path.join(root, 'scripts/package.js'));
   await fs.copyFile('package.json', path.join(root, 'package.json'));
+  await fs.cp('node_modules', path.join(root, 'node_modules'), { recursive: true });
   for (const file of [
     'README.md',
     'docs/features.md',
@@ -181,6 +182,9 @@ test('VSIX includes only the distributed samples, not personal output documents'
   assert.ok(names.includes('extension/output/サンプル_アットウィキ.txt'));
   assert.ok(names.includes('extension/output/拡張記法サンプル.txt'));
   assert.ok(!names.includes('extension/output/private.txt'));
+  assert.ok(names.includes('extension/node_modules/sharp/package.json'));
+  assert.ok(names.some((name) => name.endsWith('.node')));
+  assert.ok(!names.some((name) => name.startsWith('extension/node_modules/prettier/')));
 });
 
 test('included warnings retain their page and later inline warnings retain their host row', () => {

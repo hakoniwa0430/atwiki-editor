@@ -10,6 +10,8 @@ VS Codeの設定画面で `atwiki` を検索し、必要な項目を変更しま
 
 | 設定名 | 既定値 | 内容 |
 | --- | --- | --- |
+| `atwiki.webp.compression` | `"lossless"` | WebP変換の圧縮方式。画質維持の `lossless` または容量優先の `lossy`。 |
+| `atwiki.webp.quality` | `80` | WebPの非可逆圧縮時の画質（1～100）。 |
 | `atwiki.autoLink.excludedPages` | `[]` | ページ名の自動リンクから除外するローカルページ名（拡張子なし）。初期ページや非公開ページなどを指定します。 |
 | `atwiki.preview.wikiName` | `"ローカルWiki"` | wikiname に表示するウィキ名。 |
 | `atwiki.preview.wikiUrl` | `""` | wikiurl に表示するウィキのURL。 |

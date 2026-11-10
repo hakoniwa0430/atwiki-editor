@@ -1,14 +1,15 @@
 # Atwiki Editor
 
-アットウィキ記法の編集・ライブプレビューに対応した非公式の VS Code 拡張機能です。対象は VS Code 1.85.0 以降です。
+アットウィキ記法の編集・ライブプレビューに対応した非公式の VS Code 拡張機能です。対象は VS Code 1.92.0 以降です。
 
 ## インストール
 
 配布された `atwiki-editor-1.0.0.vsix` を、VS Codeの拡張機能画面の「…」→「VSIXからのインストール…」で選びます。VSIXからの導入にはNode.jsやnpmは不要です。配布ファイルは[GitHub Releases](https://github.com/hakoniwa0430/atwiki-editor/releases)に掲載されている場合にダウンロードできます。
 
-ソースから生成する場合は、Node.jsとnpmを用意してリポジトリのルートで以下を実行します。実行時ライブラリは同梱済みのため、生成前の `npm ci` は不要です。
+ソースから生成する場合は、Node.js 20.9以降とnpmを用意してリポジトリのルートで以下を実行します。WebP変換用のネイティブライブラリを含むため、利用するOS・CPUに合わせた環境で生成してください。生成したVSIXには実行時ライブラリも同梱されます。
 
 ```sh
+npm ci
 npm run package
 code --install-extension atwiki-editor-1.0.0.vsix
 ```

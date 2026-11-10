@@ -14,7 +14,7 @@
     "url": "https://github.com/hakoniwa0430/atwiki-editor/issues"
   },
   "engines": {
-    "vscode": "^1.85.0"
+    "vscode": "^1.92.0"
   },
   "categories": [
     "Visualization",
@@ -66,6 +66,14 @@
       }
     ],
     "commands": [
+      {
+        "command": "atwiki.convertImagesToWebpOnly",
+        "title": "アットウィキ: 画像をWebPに変換する"
+      },
+      {
+        "command": "atwiki.convertImagesToWebp",
+        "title": "アットウィキ: 画像をWebPに変換して参照を更新"
+      },
       {
         "command": "atwiki.autoLinkPageNames",
         "title": "アットウィキ: ページ名の自動リンクを実行（現在の本文）",
@@ -122,6 +130,16 @@
       ],
       "editor/context": [
         {
+          "command": "atwiki.convertImagesToWebpOnly",
+          "when": "editorLangId == atwiki && resourceScheme == file",
+          "group": "atwikiImages"
+        },
+        {
+          "command": "atwiki.convertImagesToWebp",
+          "when": "editorLangId == atwiki && resourceScheme == file",
+          "group": "atwikiImages"
+        },
+        {
           "command": "atwiki.autoLinkPageNames",
           "when": "(editorLangId == atwiki || editorLangId == plaintext) && resourceScheme == file",
           "group": "atwikiLinks"
@@ -164,9 +182,25 @@
     "configuration": {
       "title": "Atwiki Editor",
       "properties": {
+        "atwiki.webp.compression": {
+          "type": "string",
+          "enum": ["lossless", "lossy"],
+          "enumDescriptions": ["画質維持（可逆圧縮）", "容量優先（非可逆圧縮）"],
+          "default": "lossless",
+          "description": "WebP変換の圧縮方式。画像サイズは変更しません。"
+        },
+        "atwiki.webp.quality": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 100,
+          "default": 80,
+          "description": "非可逆圧縮時の画質（1～100）。可逆圧縮時には適用しません。"
+        },
         "atwiki.autoLink.excludedPages": {
           "type": "array",
-          "items": { "type": "string" },
+          "items": {
+            "type": "string"
+          },
           "default": [],
           "description": "ページ名の自動リンクから除外するローカルページ名（拡張子なし）。初期ページや非公開ページなどを指定します。"
         },
@@ -246,5 +280,8 @@
   "icon": "media/icons/extension.png",
   "devDependencies": {
     "prettier": "3.6.2"
+  },
+  "dependencies": {
+    "sharp": "0.35.5"
   }
 }
