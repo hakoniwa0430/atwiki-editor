@@ -37,6 +37,68 @@ test('real image existence is checked on each render, including deletion', async
   assert.match(missing.warnings.join(), /photo.png/);
 });
 
+test('page image folders take priority only for bare image names', async (t) => {
+  const directory = await fs.mkdtemp(path.join(os.tmpdir(), 'atwiki-page-images-'));
+  t.after(() => fs.rm(directory, { recursive: true, force: true }));
+  for (const name of [
+    'folder/攻略/photo.png',
+    'folder/photo.png',
+    'folder/攻略/sub/photo.png',
+    'folder/sub/photo.png',
+    'folder/攻略/manual.pdf',
+    'folder/manual.pdf',
+    '別/photo.png',
+  ]) {
+    const file = path.join(directory, name);
+    await fs.mkdir(path.dirname(file), { recursive: true });
+    await fs.writeFile(file, 'fixture');
+  }
+  let source = '&image(photo.png)';
+  const payload = createPayload({
+    vscode: { Uri: { joinPath: (_, value) => `local:///${value}` } },
+    document: {
+      getText: () => source,
+      fileName: path.join(directory, 'folder/攻略.atwiki'),
+      uri: { toString: () => 'file:///folder/攻略.atwiki' },
+      lineCount: 1,
+    },
+    root: { fsPath: directory },
+    pageName: 'folder/攻略',
+    panel: { webview: { asWebviewUri: (uri) => uri } },
+    config: () => ({ get: (_, fallback) => fallback }),
+    mode: () => '',
+    index: {
+      get: async () => ({
+        pages: { 'folder/攻略': { text: '&image(photo.png)' } },
+        images: [],
+      }),
+    },
+    loadScripts: async () => ({}),
+  });
+  for (const markup of ['&image(photo.png)', '&ref(photo.png)']) {
+    source = markup;
+    const result = await payload();
+    assert.ok(result.html.includes('src="local:///folder/攻略/photo.png"'), markup);
+    assert.deepEqual(result.warnings, []);
+  }
+  for (const name of ['sub/photo.png', './photo.png', 'sub\\photo.png']) {
+    source = `&image(${name})`;
+    const expected = name.startsWith('./') ? 'photo.png' : 'sub/photo.png';
+    assert.ok((await payload()).html.includes(`src="local:///folder/${expected}"`));
+  }
+  source = '&image(photo.png,page=別)';
+  assert.ok((await payload()).html.includes('src="local:///別/photo.png"'));
+  source = '&ref(manual.pdf)';
+  assert.ok((await payload()).html.includes('data-attachment="folder/manual.pdf"'));
+  source = '&image(photo.png)';
+  await fs.unlink(path.join(directory, 'folder/攻略/photo.png'));
+  assert.ok((await payload()).html.includes('src="local:///folder/photo.png"'));
+  await fs.unlink(path.join(directory, 'folder/photo.png'));
+  const missing = await payload();
+  assert.doesNotMatch(missing.html, /<img /);
+  assert.match(missing.warnings.join(), /photo.png/);
+});
+
 async function preview(text, settings = {}) {
   return createPayload({
     vscode: { Uri: { joinPath: (_, value) => `local:///${value}` } },
@@ -53,7 +115,7 @@ async function preview(text, settings = {}) {
     mode: () => '',
     index: { get: async () => ({ pages: {}, images: [] }) },
     loadScripts: async () => ({}),
-    imageExists: async (file) => file.endsWith('picture.png'),
+    imageExists: async (file) => file.replaceAll('\\', '/').endsWith('/folder/picture.png'),
   })();
 }
 

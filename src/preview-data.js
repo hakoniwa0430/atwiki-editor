@@ -42,6 +42,8 @@ function createPayload({
       if (/^https:\/\//i.test(value) && config().get('allowRemoteImages', false)) return value;
       if (!value || /[\x00-\x1f]/.test(value) || /^(?:[a-z][\w+.-]*:|[\\/])/i.test(value))
         return null;
+      const pageImage =
+        !attachment && !page && !/[\\/]/.test(value) ? `${sourcePage || pageName}/${value}` : null;
       if (page) value = `${page}/${value}`;
       else {
         const directory = (sourcePage || pageName).split('/').slice(0, -1).join('/');
@@ -62,10 +64,22 @@ function createPayload({
         (!attachment && !/\.(?:png|jpe?g|gif|webp|bmp|svg|avif)$/i.test(normalized))
       )
         return null;
-      pendingFiles.add(normalized);
-      if (!verified.get(normalized)) return null;
-      if (attachment) return normalized;
-      return panel.webview.asWebviewUri(vscode.Uri.joinPath(root, normalized)).toString();
+      const candidates = [normalized];
+      if (pageImage) {
+        const preferred = path.posix.normalize(pageImage.replace(/\\/g, '/'));
+        if (
+          preferred !== '..' &&
+          !preferred.startsWith('../') &&
+          !/^(?:[a-z][\w+.-]*:|\/)/i.test(preferred) &&
+          !/[\x00-\x1f]/.test(preferred)
+        )
+          candidates.unshift(preferred);
+      }
+      for (const candidate of candidates) pendingFiles.add(candidate);
+      const resolved = candidates.find((candidate) => verified.get(candidate));
+      if (!resolved) return null;
+      if (attachment) return resolved;
+      return panel.webview.asWebviewUri(vscode.Uri.joinPath(root, resolved)).toString();
     }
     const text = document.getText();
     const indexed = !document.isUntitled
