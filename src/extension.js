@@ -6,12 +6,36 @@ const { openPreviewSession } = require('./preview-session');
 const { loadPages, resolvePage, loadScripts } = require('./local-pages');
 
 function activate(context) {
-  require('./snapshots').registerSnapshots(vscode, context);
   require('./webp-conversion').registerWebp(vscode, context);
   const previews = new Map();
   const pageRoots = new Map();
+  const syncStore = new (require('./wiki-sync').SyncStore)(
+    require('node:path').join(context.globalStorageUri.fsPath, 'wiki-sync'),
+  );
+  require('./wiki-sync').registerWikiSync(vscode, context, { store: syncStore });
+  if (vscode.workspace.createFileSystemWatcher) {
+    const watcher = vscode.workspace.createFileSystemWatcher(
+      new vscode.RelativePattern(vscode.Uri.file(syncStore.root), '*.json'),
+    );
+    const invalidate = () => syncStore.invalidateMetadata();
+    watcher.onDidCreate(invalidate);
+    watcher.onDidChange(invalidate);
+    watcher.onDidDelete(invalidate);
+    context.subscriptions.push(watcher);
+  }
   const index = new PageIndex({
     loadPages,
+    async enrichPages(pages) {
+      await Promise.all(
+        Object.values(pages).map(async (page) => {
+          try {
+            page.sync = await syncStore.readMetadata(vscode.Uri.file(page.file).toString());
+          } catch {
+            /* Missing or invalid sync metadata must not prevent local previews. */
+          }
+        }),
+      );
+    },
     documents: () => vscode.workspace.textDocuments || [],
     watch: vscode.workspace.createFileSystemWatcher
       ? (root, change) => {

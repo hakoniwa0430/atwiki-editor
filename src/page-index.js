@@ -3,10 +3,11 @@ const path = require('node:path');
 const { within } = require('./local-pages');
 
 class PageIndex {
-  constructor({ loadPages, documents = () => [], watch }) {
+  constructor({ loadPages, documents = () => [], watch, enrichPages = async () => {} }) {
     this.loadPages = loadPages;
     this.documents = documents;
     this.watch = watch;
+    this.enrichPages = enrichPages;
     this.roots = new Map();
   }
   entry(root) {
@@ -64,8 +65,9 @@ class PageIndex {
       const pages = Object.create(null);
       for (const [name, page] of Object.entries(indexed.pages)) {
         const document = page.file && documents.get(path.resolve(page.file));
-        pages[name] = document ? { ...page, text: document.getText() } : page;
+        pages[name] = document ? { ...page, text: document.getText() } : { ...page };
       }
+      await this.enrichPages(pages);
       return { ...indexed, pages };
     }
   }

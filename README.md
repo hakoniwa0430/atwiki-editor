@@ -39,6 +39,7 @@ npm run audit
 - [機能概要](docs/features.md)
 - [インストールと使い方](docs/getting-started.md)
 - [設定](docs/settings.md)
+- [Wikiとの接続・同期・投稿](docs/wiki-sync.md)
 - [記法の対応状況](COMPATIBILITY.md)
 - [リリースノート](docs/release-notes.md)
 

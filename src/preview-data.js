@@ -1,6 +1,7 @@
 'use strict';
 const path = require('node:path');
 const { render } = require('./renderer');
+const { localImage } = require('./wiki-images');
 function sharedImageUrl(value) {
   if (typeof value !== 'string' || /[\x00-\x20\\]/.test(value)) return null;
   try {
@@ -34,9 +35,26 @@ function createPayload({
   loadFeeds = require('./feed-loader').createFeedLoader(),
 }) {
   return async function payload() {
+    const indexed = !document.isUntitled
+      ? await index.get(root.fsPath || path.dirname(document.fileName))
+      : { pages: {}, images: [], truncated: false };
+    const syncedPages = Object.values(indexed.pages)
+      .map((page) => page.sync)
+      .filter(Boolean);
     const verified = new Map(),
       pendingFiles = new Set();
     function resolveImage(value, page, sourcePage, attachment = false) {
+      const owner = page || sourcePage || pageName;
+      const originalName = indexed.pages[owner]?.sync?.pagename;
+      const cached =
+        !attachment &&
+        (localImage(value, syncedPages) ||
+          (originalName && !/[\\/:]/.test(value) ? `${originalName}/${value}` : null));
+      if (cached) {
+        pendingFiles.add(cached);
+        if (verified.get(cached))
+          return panel.webview.asWebviewUri(vscode.Uri.joinPath(root, cached)).toString();
+      }
       const shared = sharedImageUrl(value);
       if (shared && config().get('allowSharedImages', true)) return shared;
       if (/^https:\/\//i.test(value) && config().get('allowRemoteImages', false)) return value;
@@ -82,9 +100,6 @@ function createPayload({
       return panel.webview.asWebviewUri(vscode.Uri.joinPath(root, resolved)).toString();
     }
     const text = document.getText();
-    const indexed = !document.isUntitled
-      ? await index.get(root.fsPath || path.dirname(document.fileName))
-      : { pages: {}, images: [], truncated: false };
     const directory = pageName.split('/').slice(0, -1).join('/'),
       prefix = directory ? directory + '/' : '';
     const images = (indexed.images || [])

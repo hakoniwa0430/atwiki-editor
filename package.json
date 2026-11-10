@@ -85,24 +85,46 @@
         "icon": "$(open-preview)"
       },
       {
-        "command": "atwiki.saveSnapshot",
-        "title": "アットウィキ: 現在の状態を保存",
-        "icon": "$(save)"
+        "command": "atwiki.connectWiki",
+        "title": "アットウィキ: Wikiに接続（OAuth）"
       },
       {
-        "command": "atwiki.compareSnapshot",
-        "title": "アットウィキ: 最新の保存状態と比較",
+        "command": "atwiki.disconnectWiki",
+        "title": "アットウィキ: Wikiとの接続を解除"
+      },
+      {
+        "command": "atwiki.downloadWikiPage",
+        "title": "アットウィキ: Wikiの全ページを取得・同期"
+      },
+      {
+        "command": "atwiki.compareWikiPage",
+        "title": "アットウィキ: Wikiの最新更新と比較",
         "icon": "$(diff)"
       },
       {
-        "command": "atwiki.selectSnapshot",
-        "title": "アットウィキ: 履歴を選んで比較",
-        "icon": "$(history)"
+        "command": "atwiki.pullWikiPage",
+        "title": "アットウィキ: Wikiの全ページを同期"
       },
       {
-        "command": "atwiki.restoreSnapshot",
-        "title": "アットウィキ: 履歴から復元",
-        "icon": "$(discard)"
+        "command": "atwiki.pullCurrentWikiPage",
+        "title": "アットウィキ: 現在のページだけ同期"
+      },
+      {
+        "command": "atwiki.resolveWikiConflict",
+        "title": "アットウィキ: 競合解決済みとして同期基準を更新"
+      },
+      {
+        "command": "atwiki.publishWikiPage",
+        "title": "アットウィキ: 差分を確認して本家へ投稿"
+      },
+      {
+        "command": "atwiki.updateWikiPage",
+        "title": "アットウィキ: Wikiを更新（1ファイルを指定）",
+        "icon": "$(cloud-upload)"
+      },
+      {
+        "command": "atwiki.createWikiPage",
+        "title": "アットウィキ: ページを追加"
       }
     ],
     "menus": {
@@ -110,22 +132,17 @@
         {
           "command": "atwiki.openPreview",
           "when": "editorLangId == atwiki",
-          "group": "navigation"
+          "group": "navigation@0"
         },
         {
-          "command": "atwiki.saveSnapshot",
-          "when": "editorLangId == atwiki || editorLangId == plaintext",
-          "group": "navigation"
+          "command": "atwiki.compareWikiPage",
+          "when": "(editorLangId == atwiki || editorLangId == plaintext) && resourceScheme == file && isWorkspaceTrusted",
+          "group": "navigation@2"
         },
         {
-          "command": "atwiki.compareSnapshot",
-          "when": "editorLangId == atwiki || editorLangId == plaintext",
-          "group": "navigation"
-        },
-        {
-          "command": "atwiki.restoreSnapshot",
-          "when": "(editorLangId == atwiki || editorLangId == plaintext) && resourceScheme == file",
-          "group": "navigation"
+          "command": "atwiki.updateWikiPage",
+          "when": "(editorLangId == atwiki || editorLangId == plaintext) && resourceScheme == file && isWorkspaceTrusted",
+          "group": "navigation@3"
         }
       ],
       "editor/context": [
@@ -150,24 +167,31 @@
           "group": "navigation"
         },
         {
-          "command": "atwiki.saveSnapshot",
-          "when": "editorLangId == atwiki || editorLangId == plaintext",
-          "group": "atwikiSnapshots"
+          "command": "atwiki.compareWikiPage",
+          "when": "(editorLangId == atwiki || editorLangId == plaintext) && resourceScheme == file && isWorkspaceTrusted",
+          "group": "atwikiSync"
         },
         {
-          "command": "atwiki.compareSnapshot",
-          "when": "editorLangId == atwiki || editorLangId == plaintext",
-          "group": "atwikiSnapshots"
+          "command": "atwiki.pullWikiPage",
+          "when": "(editorLangId == atwiki || editorLangId == plaintext) && resourceScheme == file && isWorkspaceTrusted",
+          "group": "atwikiSync"
         },
         {
-          "command": "atwiki.selectSnapshot",
-          "when": "editorLangId == atwiki || editorLangId == plaintext",
-          "group": "atwikiSnapshots"
+          "command": "atwiki.resolveWikiConflict",
+          "when": "(editorLangId == atwiki || editorLangId == plaintext) && resourceScheme == file && isWorkspaceTrusted",
+          "group": "atwikiSync"
         },
         {
-          "command": "atwiki.restoreSnapshot",
-          "when": "(editorLangId == atwiki || editorLangId == plaintext) && resourceScheme == file",
-          "group": "atwikiSnapshots"
+          "command": "atwiki.publishWikiPage",
+          "when": "(editorLangId == atwiki || editorLangId == plaintext) && resourceScheme == file && isWorkspaceTrusted",
+          "group": "atwikiSync"
+        }
+      ],
+      "explorer/context": [
+        {
+          "command": "atwiki.updateWikiPage",
+          "when": "resourceScheme == file && !explorerResourceIsFolder && (resourceExtname == .atwiki || resourceExtname == .atw || resourceExtname == .txt) && isWorkspaceTrusted",
+          "group": "atwikiSync"
         }
       ]
     },
@@ -289,5 +313,8 @@
   },
   "dependencies": {
     "sharp": "0.35.5"
-  }
+  },
+  "activationEvents": [
+    "onUri"
+  ]
 }
