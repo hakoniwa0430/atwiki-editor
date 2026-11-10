@@ -5,7 +5,7 @@ const fs = require('node:fs/promises');
 const os = require('node:os');
 const path = require('node:path');
 const sharp = require('sharp');
-const { updateReferences } = require('../src/webp-references');
+const { resolveReference, updateReferences } = require('../src/webp-references');
 const { encodeWebp, inventory, registerWebp } = require('../src/webp-conversion');
 
 test('updates only references resolving to converted images, preserving formatting and options', () => {
@@ -45,6 +45,48 @@ test('relative page paths and unconverted attachment precedence', () => {
     ).text,
     '#image(a.png)\n#image(../a.webp)',
   );
+});
+
+for (const folder of ['', 'folder/']) {
+  for (const newAttachment of [false, true]) {
+    test(`rewritten references avoid attachment shadowing (${folder}, new=${newAttachment})`, () => {
+      const files = new Set([
+        `${folder}a.png`,
+        `${folder}Page/a.${newAttachment ? 'jpg' : 'webp'}`,
+      ]);
+      const converted = new Set([`${folder}a.png`]);
+      if (newAttachment) converted.add(`${folder}Page/a.jpg`);
+      const result = updateReferences(
+        '#image( a.png ,width=20)\n<img src="a.png">',
+        `${folder}Page`,
+        files,
+        converted,
+      );
+      assert.equal(result.text, '#image( ./a.webp ,width=20)\n<img src="./a.webp">');
+      assert.equal(result.count, 2);
+      assert.equal(
+        resolveReference(
+          './a.webp',
+          undefined,
+          `${folder}Page`,
+          new Set([`${folder}a.webp`, `${folder}Page/a.webp`]),
+        ),
+        `${folder}a.webp`,
+      );
+    });
+  }
+}
+
+test('random images resolve both forms against the specified page', () => {
+  const input = '#random_img(page=Other){a.png, b.png}\n#random_img(a.png,page=Other,b.png)';
+  const files = new Set(['Other/a.png', 'Other/b.png', 'Page/a.png']);
+  const result = updateReferences(input, 'Page', files, new Set(['Other/a.png']));
+  assert.equal(result.count, 2);
+  assert.equal(
+    result.text,
+    '#random_img(page=Other){a.webp, b.png}\n#random_img(a.webp,page=Other,b.png)',
+  );
+  assert.equal(updateReferences(input, 'Page', files, new Set(['Page/a.png'])).text, input);
 });
 
 test('lossless WebP preserves RGBA pixels and dimensions; lossy is valid WebP', async () => {
@@ -201,6 +243,41 @@ test('delete mode removes original only after saved reference updates', async (t
   assert.equal(app.deleted.length, 1);
   assert.equal(await fs.readFile(path.join(app.root, 'Other.atw'), 'utf8'), '&ref(a.webp)');
   assert.ok((await inventory(app.root)).has('a.webp'));
+});
+
+test('delete mode preserves the target of references shadowed by attachments', async (t) => {
+  const app = await fixture(t, { remove: true });
+  await fs.mkdir(path.join(app.root, 'Page'));
+  await fs.writeFile(path.join(app.root, 'Page/a.webp'), 'unrelated');
+  await app.command();
+  assert.equal(
+    await fs.readFile(path.join(app.root, 'Page.atwiki'), 'utf8'),
+    '#image(./a.webp,width=300)',
+  );
+  assert.equal(await fs.readFile(path.join(app.root, 'Page/a.webp'), 'utf8'), 'unrelated');
+  assert.equal(app.deleted.length, 1);
+  assert.equal(
+    resolveReference('./a.webp', undefined, 'Page', await inventory(app.root)),
+    'a.webp',
+  );
+});
+
+test('delete mode updates both random image forms before removing page images', async (t) => {
+  const app = await fixture(t, { remove: true });
+  await fs.mkdir(path.join(app.root, 'Other'));
+  await fs.copyFile(path.join(app.root, 'a.png'), path.join(app.root, 'Other/a.png'));
+  await fs.writeFile(
+    path.join(app.root, 'Page.atwiki'),
+    '#random_img(page=Other){a.png}\n#random_img(a.png,page=Other)',
+  );
+  await app.command();
+  assert.equal(
+    await fs.readFile(path.join(app.root, 'Page.atwiki'), 'utf8'),
+    '#random_img(page=Other){a.webp}\n#random_img(a.webp,page=Other)',
+  );
+  const files = await inventory(app.root);
+  assert.ok(!files.has('Other/a.png'));
+  assert.equal(resolveReference('a.webp', 'Other', 'Page', files), 'Other/a.webp');
 });
 
 for (const options of [

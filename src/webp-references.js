@@ -3,7 +3,7 @@ const path = require('node:path');
 const { readPlugin, splitTop, parameters } = require('./syntax');
 const { decode } = require('./safe-html');
 
-// Match the local preview's page attachment precedence, against the original inventory.
+// Match the local preview's page attachment precedence.
 function resolveReference(value, page, sourcePage, files) {
   if (!value || /[\x00-\x1f]/.test(value) || /^(?:[a-z][\w+.-]*:|[\\/])/i.test(value)) return null;
   const directory = path.posix.dirname(sourcePage);
@@ -24,18 +24,35 @@ function resolveReference(value, page, sourcePage, files) {
 
 function updateReferences(text, sourcePage, files, converted) {
   const edits = [];
+  const resultingFiles = new Set(files);
+  for (const file of converted) resultingFiles.add(file.replace(/\.[^.\/]+$/, '.webp'));
   function reference(raw, at, page, html = false) {
     const leading = raw.match(/^\s*/)[0].length;
     const value = raw.trim();
     const resolved = resolveReference(html ? decode(value) : value, page, sourcePage, files);
     if (!resolved || !converted.has(resolved)) return;
     const extension = value.match(/\.[a-z0-9]+$/i);
-    if (extension)
+    if (extension) {
+      const destination = resolved.replace(/\.[^.\/]+$/, '.webp');
+      let replacement = value.slice(0, extension.index) + '.webp';
+      const resolveReplacement = () =>
+        resolveReference(
+          html ? decode(replacement) : replacement,
+          page,
+          sourcePage,
+          resultingFiles,
+        );
+      // A new page attachment may shadow a formerly unambiguous sibling image.
+      // An explicit relative path bypasses the bare-name attachment lookup.
+      if (resolveReplacement() !== destination) replacement = './' + replacement;
+      if (resolveReplacement() !== destination)
+        throw new Error(`WebP reference does not resolve to ${destination}`);
       edits.push({
-        start: at + leading + extension.index,
+        start: at + leading,
         end: at + leading + value.length,
-        text: '.webp',
+        text: replacement,
       });
+    }
   }
   function args(plugin, at) {
     const parts = splitTop(plugin.args);
@@ -57,7 +74,7 @@ function updateReferences(text, sourcePage, files, converted) {
       )
         reference(part, offset, page);
       if (plugin.name === 'random_img' && plugin.body === null && !part.includes('='))
-        reference(part, offset);
+        reference(part, offset, page);
       const key = ['link_anchor', 'link_aname'].includes(plugin.name)
         ? 'img'
         : ['new3', 'newimage'].includes(plugin.name)
@@ -139,9 +156,11 @@ function updateReferences(text, sourcePage, files, converted) {
       if (plugin.args) args(plugin, open + 1);
       if (plugin.body !== null) {
         if (['random_img', 'slide_img'].includes(plugin.name)) {
+          const page =
+            plugin.name === 'random_img' ? parameters(plugin.args).values.page : undefined;
           let offset = plugin.bodyStart;
           for (const part of splitTop(plugin.body)) {
-            reference(part, offset);
+            reference(part, offset, page);
             offset += part.length + 1;
           }
         } else scan(plugin.bodyStart, plugin.bodyStart + plugin.body.length);
