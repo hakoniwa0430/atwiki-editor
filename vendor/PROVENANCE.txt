@@ -25,3 +25,9 @@ svgs/brands/old-republic.svg from tag 6.7.2, retrieved 2026-11-06 and preserved
 as vendor/old-republic.svg. Other icon geometry is unmodified. Font Awesome Pro icons are not included.
 
 media/icons/quote-left.svg uses the Font Awesome Free 6.7.2 solid quote-left geometry from icons.json (CC BY 4.0, see FONT-AWESOME-LICENSE.txt); display size 24px and fill #d9d9d9 added. It approximates the unavailable AtWiki quote decoration.
+
+WebP conversion runtime: sharp 0.35.5 (Apache-2.0), https://github.com/lovell/sharp/tree/v0.35.5
+Installed from the pinned npm package and packaged unmodified with its runtime dependencies.
+Licenses and native libvips dependency notices are included under extension/node_modules/
+(sharp/LICENSE and @img/sharp-win32-x64/LICENSE, including bundled third-party notices).
+The release VSIX targets Windows x64; other platforms require their own native packages.

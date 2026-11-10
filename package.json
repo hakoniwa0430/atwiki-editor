@@ -2,7 +2,7 @@
   "name": "atwiki-local-preview",
   "displayName": "Atwiki Editor",
   "description": "アットウィキ記法をオフラインで編集・ライブプレビューする拡張機能",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "publisher": "atwiki-local-tools",
   "license": "MIT",
   "repository": {
@@ -184,8 +184,14 @@
       "properties": {
         "atwiki.webp.compression": {
           "type": "string",
-          "enum": ["lossless", "lossy"],
-          "enumDescriptions": ["画質維持（可逆圧縮）", "容量優先（非可逆圧縮）"],
+          "enum": [
+            "lossless",
+            "lossy"
+          ],
+          "enumDescriptions": [
+            "画質維持（可逆圧縮）",
+            "容量優先（非可逆圧縮）"
+          ],
           "default": "lossless",
           "description": "WebP変換の圧縮方式。画像サイズは変更しません。"
         },
