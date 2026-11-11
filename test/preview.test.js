@@ -147,7 +147,7 @@ test('extension-side errors are displayed in the preview', () => {
   assert.equal(app.elements.get('status').textContent, '表示エラー: read failed');
 });
 
-test('anchor messages fall back to exact heading text and expand containing regions', () => {
+test('user links require aname while generated contents links still navigate headings', () => {
   const app = setup();
   let scrolled = 0;
   const parent = { tagName: 'DETAILS', open: false, parentElement: null };
@@ -161,16 +161,31 @@ test('anchor messages fall back to exact heading text and expand containing regi
   app.elements.get('content').querySelectorAll = (selector) =>
     selector === 'h2,h3,h4,h5,h6' ? [heading] : [];
   app.deliver({ type: 'anchor', anchor: '墜落魔ジャッキー', token: app.token });
+  assert.equal(scrolled, 0);
+  assert.equal(parent.open, false);
+  app.elements.set('heading-1', heading);
+  app.deliver({ type: 'anchor', anchor: 'heading-1', token: app.token });
+  app.click({ dataset: { namedAnchor: 'true' }, getAttribute: () => '#heading-1' });
+  assert.equal(scrolled, 0);
+  app.click({ dataset: {}, getAttribute: () => '#heading-1' });
   assert.equal(scrolled, 1);
   assert.equal(parent.open, true);
   app.elements.set('墜落魔ジャッキー', {
-    parentElement: null,
+    dataset: { atwikiAnchor: 'true' },
+    parentElement: parent,
     scrollIntoView() {
       scrolled += 10;
     },
   });
   app.deliver({ type: 'anchor', anchor: '墜落魔ジャッキー', token: app.token });
   assert.equal(scrolled, 11);
+  app.click({
+    dataset: { namedAnchor: 'true' },
+    getAttribute: () => '#' + encodeURIComponent('墜落魔ジャッキー'),
+  });
+  assert.equal(scrolled, 21);
+  app.deliver({ type: 'anchor', anchor: 'heading-1', generatedAnchor: true, token: app.token });
+  assert.equal(scrolled, 22);
 });
 
 test('attachment and blank page links send the correct host requests', () => {

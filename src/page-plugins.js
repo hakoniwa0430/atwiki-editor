@@ -271,7 +271,7 @@ function pagePlugin(p, ctx, depth, line) {
           .map(
             (n) =>
               '<li>' +
-              localLink(n.label, s + '#' + n.anchor) +
+              link(n.label, s + '#' + n.anchor, depth + 1, false, false, true) +
               (n.children.length ? tree(n.children) : '') +
               '</li>',
           )

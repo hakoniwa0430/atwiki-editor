@@ -27,7 +27,6 @@ test('completion handles pages, explicit anchors, images, nested and multiline a
     ['[[表示>別', '別'],
     ['#include(攻略/', '攻略/基本'],
     ['[[別#場', '場所'],
-    ['[[別#説', '説明'],
     ['&link_anchor(未', '未保存'],
     ['&image(a', 'a.png'],
     ['&infobox(title=[[表示>別', '別'],
@@ -38,6 +37,19 @@ test('completion handles pages, explicit anchors, images, nested and multiline a
       source,
     );
   assert.deepEqual(candidates('#include(別)\n普通の文章', data), []);
+  assert.deepEqual(
+    candidates('[[別#', data).map((c) => c.label),
+    ['場所'],
+  );
+  for (const prefix of ['[[#', '[[表示>#', '[[別#', '&link_anchor(']) {
+    assert.deepEqual(
+      candidates(prefix, {
+        ownText: '*見出し\n**小見出し [#説明]',
+        pages: { 別: '*見出し\n**小見出し [#説明]' },
+      }),
+      [],
+    );
+  }
 });
 test('provider avoids IO for syntax, releases indexes and honors cancellation', async () => {
   let provider,

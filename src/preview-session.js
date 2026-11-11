@@ -81,7 +81,11 @@ function openPreviewSession({
     async afterRender(current) {
       const anchor = state.anchor;
       if (!anchor) return;
-      await postMessage({ type: 'anchor', anchor });
+      await postMessage({
+        type: 'anchor',
+        anchor,
+        generatedAnchor: state.generatedAnchor === true,
+      });
       if (current() && state.anchor === anchor) state.anchor = null;
     },
   });
@@ -162,6 +166,7 @@ function openPreviewSession({
           const next = previews.get(target.uri.toString());
           if (next) {
             next.anchor = anchor;
+            next.generatedAnchor = message.generatedAnchor === true;
             if (next.ready) await next.update(true);
           }
         }

@@ -7,13 +7,10 @@
   let first = true;
   let cleanup = () => {};
   let pendingAnchor = '';
-  function revealAnchor(anchor) {
-    const target =
-      document.getElementById(anchor) ||
-      [...content.querySelectorAll('h2,h3,h4,h5,h6')].find(
-        (el) => el.textContent.trim() === anchor,
-      );
-    if (!target) return;
+  let pendingGeneratedAnchor = false;
+  function revealAnchor(anchor, namedOnly = true) {
+    const target = document.getElementById(anchor);
+    if (!target || (namedOnly && target.dataset?.atwikiAnchor !== 'true')) return;
     let parent = target.parentElement;
     while (parent) {
       if (parent.tagName === 'DETAILS') parent.open = true;
@@ -34,7 +31,8 @@
     try {
       if (message.type === 'anchor') {
         pendingAnchor = message.anchor;
-        revealAnchor(pendingAnchor);
+        pendingGeneratedAnchor = message.generatedAnchor === true;
+        revealAnchor(pendingAnchor, !pendingGeneratedAnchor);
       }
       if (message.type === 'render') {
         const top = first ? saved.scroll || 0 : window.scrollY;
@@ -86,7 +84,7 @@
         document.getElementById('warning-count').textContent = `(${message.warnings.length})`;
         window.scrollTo(0, top);
         if (pendingAnchor) {
-          revealAnchor(pendingAnchor);
+          revealAnchor(pendingAnchor, !pendingGeneratedAnchor);
           pendingAnchor = '';
         }
         first = false;
@@ -121,6 +119,7 @@
         type: 'page',
         page: link.dataset.page,
         newWindow: link.dataset.newWindow === 'true',
+        generatedAnchor: link.dataset.generatedAnchor === 'true',
       });
       return;
     }
@@ -132,7 +131,7 @@
       } catch {
         /* keep original */
       }
-      revealAnchor(anchor);
+      revealAnchor(anchor, link.dataset.namedAnchor === 'true');
     } else if (/^(https?:\/\/|mailto:|tel:)/i.test(href))
       vscode.postMessage({ type: 'external', url: href });
   });

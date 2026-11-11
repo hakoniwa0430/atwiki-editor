@@ -38,12 +38,12 @@ test('image anchor links use the image resolver and retain local and cross-page 
     assert.deepEqual(r.warnings, []);
     const blocked = render(`&${name}(A,img=missing.png){移動}`, { resolveImage: () => null });
     assert.doesNotMatch(blocked.html, /<img/);
-    assert.match(blocked.html, /href="#A">移動/);
+    assert.match(blocked.html, /href="#A" data-named-anchor="true">移動/);
     assert.ok(blocked.warnings.some((w) => w.includes('画像の参照先')));
     const local = render(`&${name}(A,page=別,anchor_only=true,img=local.png){移動}`, {
       resolveImage: () => 'local.png',
     });
-    assert.match(local.html, /href="#A"><img /);
+    assert.match(local.html, /href="#A" data-named-anchor="true"><img /);
   }
 });
 

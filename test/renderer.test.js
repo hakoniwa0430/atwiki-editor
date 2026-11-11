@@ -209,6 +209,6 @@ test('cross-page anchor plugins preserve folder paths, aliases and anchor_only',
     '&link_anchor(場所,page=ほげ/ふが){移動}\n&link_aname(page=ほげ/ふが,場所){別名}\n[[通常>ほげ/ふが#場所]]\n&link_anchor(場所,page=ほげ/ふが,anchor_only=true){ここ}',
   );
   assert.equal((html.match(/data-page="ほげ\/ふが#場所"/g) || []).length, 3);
-  assert.match(html, /href="#場所">ここ/);
+  assert.match(html, /href="#場所" data-named-anchor="true">ここ/);
   assert.deepEqual(warnings, []);
 });

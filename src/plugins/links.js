@@ -8,7 +8,7 @@ function plugin(p, ctx, depth = 0, line = 0) {
     const anchor = id(parts[0]);
     if (anchor !== parts[0]) warn('アンカー名の重複');
     const label = inline(body || '', depth + 1);
-    return `<span id="${esc(anchor)}">${v.option === 'nolink' ? label : `<a href="#${esc(anchor)}">${label || '⚓'}</a>`}</span>`;
+    return `<span id="${esc(anchor)}" data-atwiki-anchor="true">${v.option === 'nolink' ? label : `<a href="#${esc(anchor)}">${label || '⚓'}</a>`}</span>`;
   }
   if (name === 'link' || name === 'blanklink')
     return link(args, body || args, depth + 1, false, name === 'blanklink');

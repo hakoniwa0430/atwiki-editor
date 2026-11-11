@@ -74,7 +74,10 @@ test('link validation handles forward anchors, headings, encoded names and cross
       今: source,
     },
   };
-  assert.deepEqual(render(source, options).warnings, []);
+  assert.deepEqual(render(source, options).warnings, [
+    'アンカーが見つかりません: 別#見出し',
+    'アンカーが見つかりません: #見出し',
+  ]);
   const bad = render(
     '[[a>#不在]] [[b>別#不在]] [[c>未作成]] [[d>https://example.com/#missing]]',
     options,
@@ -93,7 +96,8 @@ test('completion covers plugin names, options, pages and unsaved anchor text', (
   assert.equal(candidates('#include(攻略/', pages)[0].label, '攻略/基本');
   assert.equal(candidates('&image(a.png,page=攻略/', pages)[0].label, '攻略/基本');
   assert.ok(candidates('[[表示>攻略/基本#', pages).some((c) => c.label === '場所'));
-  assert.ok(candidates('[[表示>#', pages, '*未保存見出し').some((c) => c.label === '未保存見出し'));
+  assert.deepEqual(candidates('[[表示>#', pages, '*未保存見出し'), []);
+  assert.ok(candidates('[[表示>#', pages, '&aname(未保存){}').some((c) => c.label === '未保存'));
   assert.deepEqual(candidates('普通の文章', pages), []);
 });
 
@@ -157,7 +161,7 @@ test('language providers register, release their index and show safe hover docum
     new Map(),
   );
   const items = await completion.provideCompletionItems(doc, { line: 0, character: 4 }, {});
-  assert.ok(items.some((i) => i.label === '説明'));
+  assert.deepEqual(items, []);
   assert.equal(released, 1);
   const result = hover.provideHover(
     { lineAt: () => ({ text: '#slide_img()' }) },

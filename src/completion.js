@@ -142,12 +142,9 @@ function query(prefix) {
   return { type: 'option', name: context.name, value };
 }
 function anchors(text) {
-  // Use explicit site-compatible anchors, not preview-only generated heading IDs.
+  // Only aname (and its anchor alias) defines a user-link destination.
   const values = [];
-  for (const m of text.matchAll(/&(?:aname|anchor)\(\s*([^,)]+)|^\*+[^\n]*\[#([^\]\n]+)\]\s*$/gm))
-    values.push((m[1] || m[2]).trim());
-  for (const m of text.matchAll(/^\*{1,5}([^\n]+)/gm))
-    values.push(m[1].replace(/\s*\[#[^\]]+\]$/, '').trim());
+  for (const m of text.matchAll(/&(?:aname|anchor)\(\s*([^,)]+)/g)) values.push(m[1].trim());
   return [...new Set(values)];
 }
 function candidates(prefix, { pages = {}, images = [], ownText = '', pageName = '' } = {}) {

@@ -147,7 +147,14 @@ function render(source, options = {}) {
       return `<span class="unsupported">${escapeHtml(args)}</span>`;
     }
   }
-  function link(label, target, depth = 0, htmlLabel = false, newWindow = false) {
+  function link(
+    label,
+    target,
+    depth = 0,
+    htmlLabel = false,
+    newWindow = false,
+    generatedAnchor = false,
+  ) {
     label = String(label ?? '');
     target = String(target ?? '');
     if (options.validateLinks && !/^[\w+.-]+:/.test(target)) {
@@ -165,31 +172,25 @@ function render(source, options = {}) {
             target +
             (options.pagesTruncated ? '（読み込み上限）' : ''),
         );
-      else if (anchor && anchor !== 'atwiki-top') {
-        const anchors = [
-          ...content.matchAll(/&(?:aname|anchor)\(\s*([^,)]+)|^\*{1,5}([^\n]+)/gm),
-        ].flatMap((m) =>
-          m[1]
-            ? [m[1].trim()]
-            : [m[2].replace(/\s*\[#[^\]]+\]$/, '').trim(), m[2].match(/\[#([^\]]+)\]/)?.[1]],
+      else if (anchor && !generatedAnchor) {
+        const anchors = [...content.matchAll(/&(?:aname|anchor)\(\s*([^,)]+)/g)].map((m) =>
+          m[1].trim(),
         );
-        content.split(/\r?\n/).forEach((text, line) => {
-          if (/^\*{1,5}[^*]/.test(text)) anchors.push('heading-' + (line + 1));
-        });
         if (!anchors.includes(anchor)) warn('アンカーが見つかりません: ' + target);
       }
     }
     if (newWindow && target.startsWith('#') && options.pageName) target = options.pageName + target;
     const blank = newWindow ? ' data-new-window="true"' : '';
     const text = htmlLabel ? label : inline(label, depth + 1, true);
-    if (target.startsWith('#')) return `<a href="${escapeHtml(target)}">${text}</a>`;
+    if (target.startsWith('#'))
+      return `<a href="${escapeHtml(target)}" data-named-anchor="true">${text}</a>`;
     if (/^(?:https?:\/\/|mailto:|tel:)/i.test(target) && !/[\x00-\x20]/.test(target))
       return `<a href="${escapeHtml(target)}"${blank} rel="noreferrer noopener">${text}</a>`;
     if (/^[\w+.-]+:/.test(target) || /[\x00-\x1f]/.test(target)) {
       warn(`リンク先の形式に対応していません: ${target}`);
       return text;
     }
-    return `<a href="#" class="wiki-link" data-page="${escapeHtml(target)}"${blank}>${text}</a>`;
+    return `<a href="#" class="wiki-link" data-page="${escapeHtml(target)}"${generatedAnchor ? ' data-generated-anchor="true"' : ''}${blank}>${text}</a>`;
   }
   function dispatch(p, depth, line) {
     return atLine(line, () => dispatchPlugin(p, depth, line));
