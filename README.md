@@ -4,14 +4,14 @@
 
 ## インストール
 
-配布された `atwiki-editor-1.0.1.vsix` を、VS Codeの拡張機能画面の「…」→「VSIXからのインストール…」で選びます。VSIXからの導入にはNode.jsやnpmは不要です。1.0.1の配布VSIXはWindows x64向けです。配布ファイルは[GitHub Releases](https://github.com/hakoniwa0430/atwiki-editor/releases)に掲載されている場合にダウンロードできます。
+配布された `atwiki-editor-1.1.0.vsix` を、VS Codeの拡張機能画面の「…」→「VSIXからのインストール…」で選びます。VSIXからの導入にはNode.jsやnpmは不要です。1.1.0の配布VSIXはWindows x64向けです。配布ファイルは[GitHub Releases](https://github.com/hakoniwa0430/atwiki-editor/releases)に掲載されている場合にダウンロードできます。
 
 ソースから生成する場合は、Node.js 20.9以降とnpmを用意してリポジトリのルートで以下を実行します。WebP変換用のネイティブライブラリを含むため、利用するOS・CPUに合わせた環境で生成してください。生成したVSIXには実行時ライブラリも同梱されます。
 
 ```sh
 npm ci
 npm run package
-code --install-extension atwiki-editor-1.0.1.vsix
+code --install-extension atwiki-editor-1.1.0.vsix
 ```
 
 使い方は[インストールと使い方](docs/getting-started.md)を参照してください。本家アットウィキの完全互換ではありません。外部コンテンツの通信設定と埋め込みの制限は[設定](docs/settings.md)および[リリースノート](docs/release-notes.md)に記載しています。
