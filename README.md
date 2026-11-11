@@ -4,14 +4,15 @@
 
 ## インストール
 
-配布された `atwiki-editor-1.1.0.vsix` を、VS Codeの拡張機能画面の「…」→「VSIXからのインストール…」で選びます。VSIXからの導入にはNode.jsやnpmは不要です。1.1.0の配布VSIXはWindows x64向けです。配布ファイルは[GitHub Releases](https://github.com/hakoniwa0430/atwiki-editor/releases)に掲載されている場合にダウンロードできます。
+配布された `atwiki-editor-1.1.1.vsix` を、VS Codeの拡張機能画面の「…」→「VSIXからのインストール…」で選びます。VSIXからの導入にはNode.jsやnpmは不要です。1.1.1の配布VSIXはWindows x64向けです。配布ファイルは[GitHub Releases](https://github.com/hakoniwa0430/atwiki-editor/releases)に掲載されている場合にダウンロードできます。
 
-ソースから生成する場合は、Node.js 20.9以降とnpmを用意してリポジトリのルートで以下を実行します。WebP変換用のネイティブライブラリを含むため、利用するOS・CPUに合わせた環境で生成してください。生成したVSIXには実行時ライブラリも同梱されます。
+ソースから生成する場合は、Windows x64でNode.js 20.9以降、npm、Python 3.11以降を用意して以下を実行します。WebP変換用の実行時ライブラリを同梱し、対応ソースZIPも生成します。他のOS・CPU向けの配布では、その環境用の[ライセンス・ソースマニフェストの整備](docs/third-party-licenses.md)が必要です。
 
 ```sh
 npm ci
+python scripts/third-party-sources.py --download
 npm run package
-code --install-extension atwiki-editor-1.1.0.vsix
+code --install-extension atwiki-editor-1.1.1.vsix
 ```
 
 使い方は[インストールと使い方](docs/getting-started.md)を参照してください。本家アットウィキの完全互換ではありません。外部コンテンツの通信設定と埋め込みの制限は[設定](docs/settings.md)および[リリースノート](docs/release-notes.md)に記載しています。
@@ -45,7 +46,7 @@ npm run audit
 
 ## ライセンス
 
-本体は [MIT License](LICENSE) です。同梱ライブラリのライセンスと由来は `vendor/` 内の `*-LICENSE.txt` および [PROVENANCE.txt](vendor/PROVENANCE.txt) を参照してください。
+本体は [MIT License](LICENSE) です。同梱ライブラリにはそれぞれのライセンスが適用されます。[同梱ソフトウェアのライセンスと対応ソース](docs/third-party-licenses.md)、`vendor/` 内のライセンス本文、および [PROVENANCE.txt](vendor/PROVENANCE.txt) を参照してください。画像処理ライブラリの対応ソースZIPは、配布時にVSIXと同じリリースへ掲載します。
 
 ## 不具合報告
 

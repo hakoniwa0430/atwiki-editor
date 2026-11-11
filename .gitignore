@@ -3,6 +3,8 @@ node_modules/
 
 # Packaged VS Code extensions
 *.vsix
+/*-third-party-sources.zip
+/*-third-party-sources.zip.sha256
 
 # Local inspection artifacts and test output
 /.inspection/

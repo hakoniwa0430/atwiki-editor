@@ -153,6 +153,21 @@ test('VSIX includes only the distributed samples, not personal output documents'
   for (const dir of ['scripts', 'src', 'media', 'vendor', 'syntaxes', 'snippets', 'output', 'docs'])
     await fs.mkdir(path.join(root, dir));
   await fs.copyFile('scripts/package.js', path.join(root, 'scripts/package.js'));
+  await fs.copyFile(
+    'scripts/check-native-licenses.js',
+    path.join(root, 'scripts/check-native-licenses.js'),
+  );
+  await fs.copyFile(
+    'scripts/third-party-sources.py',
+    path.join(root, 'scripts/third-party-sources.py'),
+  );
+  await fs.cp('vendor/native-licenses', path.join(root, 'vendor/native-licenses'), {
+    recursive: true,
+  });
+  await fs.copyFile(
+    'docs/third-party-licenses.md',
+    path.join(root, 'docs/third-party-licenses.md'),
+  );
   await fs.copyFile('package.json', path.join(root, 'package.json'));
   await fs.cp('node_modules', path.join(root, 'node_modules'), { recursive: true });
   for (const file of [
@@ -166,8 +181,27 @@ test('VSIX includes only the distributed samples, not personal output documents'
     'output/private.txt',
   ])
     await fs.writeFile(path.join(root, file), 'fixture');
-  execFileSync(process.execPath, [path.join(root, 'scripts/package.js')]);
   const pkg = require('../package.json');
+  // This fixture tests VSIX contents, not source acquisition. Use a tiny companion
+  // artifact with a valid checksum/receipt so tests do not need network downloads.
+  const hash = (data) => require('node:crypto').createHash('sha256').update(data).digest('hex');
+  const companion = `atwiki-editor-${pkg.version}-third-party-sources.zip`;
+  const fixture = Buffer.from('source archive fixture');
+  await fs.writeFile(path.join(root, companion), fixture);
+  await fs.writeFile(path.join(root, `${companion}.sha256`), `${hash(fixture)}  ${companion}\n`);
+  const documents = {};
+  for (const file of [
+    ...(await fs.readdir('vendor/native-licenses')).map((name) => `vendor/native-licenses/${name}`),
+    'docs/third-party-licenses.md',
+    'scripts/third-party-sources.py',
+  ])
+    documents[file] = hash(await fs.readFile(path.join(root, file)));
+  await fs.mkdir(path.join(root, '.inspection'));
+  await fs.writeFile(
+    path.join(root, '.inspection/source-distribution.json'),
+    JSON.stringify({ version: pkg.version, archive: companion, documents }),
+  );
+  execFileSync(process.execPath, [path.join(root, 'scripts/package.js')]);
   const archive = await fs.readFile(path.join(root, `atwiki-editor-${pkg.version}.vsix`));
   const names = [];
   let offset = 0;
@@ -185,6 +219,14 @@ test('VSIX includes only the distributed samples, not personal output documents'
   assert.ok(names.includes('extension/node_modules/sharp/package.json'));
   assert.ok(names.some((name) => name.endsWith('.node')));
   assert.ok(!names.some((name) => name.startsWith('extension/node_modules/prettier/')));
+  assert.ok(names.includes('extension/vendor/native-licenses/LGPL-3.0-only.txt'));
+  assert.ok(names.includes('extension/docs/third-party-licenses.md'));
+  await fs.appendFile(path.join(root, 'docs/third-party-licenses.md'), '\nstale fixture');
+  assert.throws(
+    () =>
+      execFileSync(process.execPath, [path.join(root, 'scripts/package.js')], { stdio: 'pipe' }),
+    /Source companion is stale/,
+  );
 });
 
 test('included warnings retain their page and later inline warnings retain their host row', () => {

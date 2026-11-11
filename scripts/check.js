@@ -2,6 +2,7 @@
 const fs = require('node:fs'),
   path = require('node:path'),
   { spawnSync } = require('node:child_process');
+require('./check-native-licenses').checkNativeLicenses();
 let count = 0;
 function walk(dir) {
   for (const entry of fs.readdirSync(dir, { withFileTypes: true })) {

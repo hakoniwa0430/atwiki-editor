@@ -5,6 +5,8 @@ const path = require('node:path');
 const { deflateRawSync } = require('node:zlib');
 const pkg = require('../package.json');
 const root = path.resolve(__dirname, '..');
+// A distributable VSIX must have its matching source companion ready locally.
+require('./check-native-licenses').checkNativeLicenses({ distribution: true });
 const xml = (s) =>
   String(s).replace(
     /[<>&"']/g,

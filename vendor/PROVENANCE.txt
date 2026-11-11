@@ -28,6 +28,8 @@ media/icons/quote-left.svg uses the Font Awesome Free 6.7.2 solid quote-left geo
 
 WebP conversion runtime: sharp 0.35.5 (Apache-2.0), https://github.com/lovell/sharp/tree/v0.35.5
 Installed from the pinned npm package and packaged unmodified with its runtime dependencies.
-Licenses and native libvips dependency notices are included under extension/node_modules/
-(sharp/LICENSE and @img/sharp-win32-x64/LICENSE, including bundled third-party notices).
+The package LICENSE files under extension/node_modules/ cover the respective packages;
+@img/sharp-win32-x64/LICENSE contains Apache-2.0, not all native dependency licenses.
+Native notices, GPL/LGPL/MPL texts and verified source hashes are in native-licenses/.
+See docs/third-party-licenses.md for the companion source archive and rebuild instructions.
 The release VSIX targets Windows x64; other platforms require their own native packages.
