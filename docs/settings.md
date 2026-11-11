@@ -10,7 +10,7 @@ VS Codeの設定画面で `atwiki` を検索し、必要な項目を変更しま
 
 | 設定名 | 既定値 | 内容 |
 | --- | --- | --- |
-| `atwiki.webp.compression` | `"lossless"` | WebP変換の圧縮方式。画質維持の `lossless` または容量優先の `lossy`。 |
+| `atwiki.webp.compression` | `"lossy"` | WebP変換の圧縮方式。画質維持の `lossless` または容量優先の `lossy`。 |
 | `atwiki.webp.quality` | `80` | WebPの非可逆圧縮時の画質（1～100）。 |
 | `atwiki.autoLink.excludedPages` | `[]` | ページ名の自動リンクから除外するローカルページ名（拡張子なし）。初期ページや非公開ページなどを指定します。 |
 | `atwiki.preview.wikiName` | `"ローカルWiki"` | wikiname に表示するウィキ名。 |
@@ -23,6 +23,12 @@ VS Codeの設定画面で `atwiki` を検索し、必要な項目を変更しま
 | `atwiki.preview.syncScroll` | `true` | エディターのスクロール位置をプレビューに反映します。 |
 | `atwiki.preview.allowExternalEmbeds` | `false` | YouTube・ニコニコ動画・X・Discordの埋め込みを取得します。表示すると外部サービスへ接続します。 |
 | `atwiki.preview.allowExternalFeeds` | `false` | 公開HTTPSのRSS/Atomを取得します。最大4フィード・各512KB、60秒キャッシュ。HTTP指定はHTTPSへ変換します。 |
+
+## WebP変換の圧縮方式
+
+既定では非可逆圧縮（`lossy`）、画質 `80` で変換します。非可逆圧縮では画質が劣化する場合があります。
+
+可逆圧縮（`lossless`）を選ぶと、追加の画質劣化を抑えられますが、元の画像よりファイル容量が大きくなる場合があります。特に、すでに非可逆圧縮されているJPEG画像では容量が増えることがあります。
 
 ## プレビューの表示と更新
 

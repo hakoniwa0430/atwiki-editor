@@ -94,7 +94,7 @@ test('lossless WebP preserves RGBA pixels and dimensions; lossy is valid WebP', 
   const png = await sharp(pixels, { raw: { width: 2, height: 2, channels: 4 } })
     .png()
     .toBuffer();
-  const output = await encodeWebp(png);
+  const output = await encodeWebp(png, { lossless: true });
   const metadata = await sharp(output).metadata();
   assert.equal(metadata.format, 'webp');
   assert.equal(metadata.width, 2);

@@ -19,7 +19,7 @@ async function inventory(root) {
   return files;
 }
 
-async function encodeWebp(input, { lossless = true, quality = 80 } = {}) {
+async function encodeWebp(input, { lossless = false, quality = 80 } = {}) {
   const sharp = require('sharp');
   const image = sharp(input, { animated: true, failOn: 'warning' });
   const metadata = await image.metadata();
@@ -142,7 +142,7 @@ function registerWebp(vscode, context) {
                 vscode.Uri.file(file),
               );
               const output = await encodeWebp(input, {
-                lossless: config.get('compression', 'lossless') === 'lossless',
+                lossless: config.get('compression', 'lossy') === 'lossless',
                 quality: config.get('quality', 80),
               });
               // Exclusive creation prevents overwriting even if a file appears during encoding.

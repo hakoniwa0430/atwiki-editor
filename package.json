@@ -246,7 +246,7 @@
             "画質維持（可逆圧縮）",
             "容量優先（非可逆圧縮）"
           ],
-          "default": "lossless",
+          "default": "lossy",
           "description": "WebP変換の圧縮方式。画像サイズは変更しません。"
         },
         "atwiki.webp.quality": {
