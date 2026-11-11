@@ -192,6 +192,16 @@
           "command": "atwiki.updateWikiPage",
           "when": "resourceScheme == file && !explorerResourceIsFolder && (resourceExtname == .atwiki || resourceExtname == .atw || resourceExtname == .txt) && isWorkspaceTrusted",
           "group": "atwikiSync"
+        },
+        {
+          "command": "atwiki.connectWiki",
+          "when": "resourceScheme == file && explorerResourceIsFolder && isWorkspaceTrusted",
+          "group": "atwikiSync"
+        },
+        {
+          "command": "atwiki.disconnectWiki",
+          "when": "resourceScheme == file && explorerResourceIsFolder && isWorkspaceTrusted",
+          "group": "atwikiSync"
         }
       ]
     },

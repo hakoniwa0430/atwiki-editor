@@ -167,8 +167,8 @@ class WikiApi {
     this.secrets = secrets;
     this.transport = transport;
   }
-  async config() {
-    const raw = await this.secrets.get('atwiki.oauth');
+  async config(key = 'atwiki.oauth') {
+    const raw = await this.secrets.get(key);
     if (!raw) throw Error('先に「アットウィキ: Wikiに接続」を実行してください。');
     return JSON.parse(raw);
   }
@@ -212,14 +212,14 @@ class WikiApi {
       headers: { ...options.headers, Authorization: `Bearer ${config.accessToken}` },
     });
   }
-  async session() {
-    let config = await this.config();
+  async session(key = 'atwiki.oauth') {
+    let config = await this.config(key);
     if (config.expires < Date.now() + 60000) {
       config = await this.token(config, {
         grant_type: 'refresh_token',
         refresh_token: config.refreshToken,
       });
-      await this.secrets.store('atwiki.oauth', JSON.stringify(config));
+      await this.secrets.store(key, JSON.stringify(config));
     }
     return config;
   }

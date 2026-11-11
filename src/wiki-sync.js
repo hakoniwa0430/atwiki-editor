@@ -69,6 +69,12 @@ function pageFileName(name) {
   return name + '.atwiki';
 }
 
+function connectionKey(root) {
+  let normalized = path.resolve(root);
+  if (process.platform === 'win32') normalized = normalized.toLowerCase();
+  return 'atwiki.oauth.folder.' + crypto.createHash('sha256').update(normalized).digest('hex');
+}
+
 function registerWikiSync(vscode, context, dependencies = {}) {
   const oauth = new WikiOAuth(vscode, context);
   const api = dependencies.api || new WikiApi(context.secrets);
@@ -226,9 +232,29 @@ function registerWikiSync(vscode, context, dependencies = {}) {
     if (!(await vscode.workspace.applyEdit(edit))) throw Error('本文を置換できませんでした。');
     // Leave the change in the editor: the user can undo it or save it normally.
   }
-  command('connectWiki', async () => {
+  command('connectWiki', async (uri) => {
+    const root = await workspaceRoot(uri);
+    if (!root) return;
+    const key = connectionKey(root);
+    const legacy = await context.secrets.get('atwiki.oauth');
+    if (legacy && !(await context.secrets.get(key))) {
+      const old = JSON.parse(legacy);
+      const choice = await vscode.window.showInformationMessage(
+        `${root} に以前の接続先 ${old.wiki} を引き継ぎますか？`,
+        { modal: true },
+        '以前の接続を引き継ぐ',
+        '別のWikiに接続',
+      );
+      if (!choice) return;
+      if (choice === '以前の接続を引き継ぐ') {
+        await context.secrets.store(key, legacy);
+        await context.secrets.delete('atwiki.oauth');
+        vscode.window.showInformationMessage(`${root}: ${old.wiki} に接続しました。`);
+        return;
+      }
+    }
     const value = await input(
-      '接続するWikiの個別名またはURL（例: sample / https://w.atwiki.jp/sample/）',
+      `${root} の接続先Wikiの個別名またはURL（例: sample / https://w.atwiki.jp/sample/）`,
     );
     if (!value) return;
     const wiki = wikiId(value.trim());
@@ -260,23 +286,39 @@ function registerWikiSync(vscode, context, dependencies = {}) {
       throw Error(
         'Wikiまたは権限が一致しません。user:read / wiki:read / wiki:write を登録してください。',
       );
-    await context.secrets.store('atwiki.oauth', JSON.stringify(session));
-    vscode.window.showInformationMessage(`${wiki} に接続しました。`);
+    await context.secrets.store(key, JSON.stringify(session));
+    vscode.window.showInformationMessage(`${root}: ${wiki} に接続しました。`);
   });
-  command('disconnectWiki', async () => {
-    await context.secrets.delete('atwiki.oauth');
+  command('disconnectWiki', async (uri) => {
+    const root = await workspaceRoot(uri);
+    if (!root) return;
+    await context.secrets.delete(connectionKey(root));
     vscode.window.showInformationMessage(
-      'この拡張機能の接続情報を削除しました。認可の失効はWikiのOAuth アプリ管理で行えます。ローカル本文・履歴は残ります。',
+      `${root} の接続情報を削除しました。認可の失効はWikiのOAuth アプリ管理で行えます。ローカル本文・履歴は残ります。`,
     );
   });
-  function workspaceRoot() {
-    const active = vscode.window.activeTextEditor?.document.uri;
-    const folder =
-      (active && vscode.workspace.getWorkspaceFolder?.(active)) ||
-      vscode.workspace.workspaceFolders?.[0];
-    if (!folder || folder.uri.scheme !== 'file')
-      throw Error('保存先となるローカルフォルダをVS Codeで開いてください。');
-    return folder.uri.fsPath;
+  async function workspaceRoot(uri = vscode.window.activeTextEditor?.document.uri) {
+    const folders = (vscode.workspace.workspaceFolders || []).filter(
+      (f) => f.uri.scheme === 'file',
+    );
+    const selected = uri && vscode.workspace.getWorkspaceFolder?.(uri);
+    if (selected?.uri.scheme === 'file') return selected.uri.fsPath;
+    if (folders.length === 1) return folders[0].uri.fsPath;
+    if (!folders.length) throw Error('保存先となるローカルフォルダをVS Codeで開いてください。');
+    const picked = await vscode.window.showQuickPick(
+      folders.map((f) => ({
+        label: f.name || path.basename(f.uri.fsPath),
+        description: f.uri.fsPath,
+        folder: f,
+      })),
+      { placeHolder: '操作するWikiのフォルダを選択' },
+    );
+    return picked?.folder.uri.fsPath;
+  }
+  function documentSession(doc) {
+    const root =
+      vscode.workspace.getWorkspaceFolder?.(doc.uri)?.uri.fsPath || path.dirname(doc.fileName);
+    return api.session(connectionKey(root));
   }
   async function allPages(config) {
     const pages = [],
@@ -312,8 +354,9 @@ function registerWikiSync(vscode, context, dependencies = {}) {
     return pages;
   }
   async function pullWiki() {
-    const root = workspaceRoot();
-    let config = await api.session();
+    const root = await workspaceRoot();
+    if (!root) return;
+    let config = await api.session(connectionKey(root));
     const wiki = config.wiki;
     const pages = await allPages(config);
     let updated = 0,
@@ -324,7 +367,7 @@ function registerWikiSync(vscode, context, dependencies = {}) {
     const problems = [];
     for (const item of pages) {
       try {
-        config = await api.session();
+        config = await api.session(connectionKey(root));
         if (config.wiki !== wiki) throw Error('接続先Wikiが変更されました。再同期してください。');
         const remote = await api.page(config, item.pageid);
         let name = remote.pagename
@@ -333,6 +376,11 @@ function registerWikiSync(vscode, context, dependencies = {}) {
           .slice(0, 100);
         if (!name || /^(con|prn|aux|nul|com[0-9]|lpt[0-9])(?:\.|$)/i.test(name)) name = '_' + name;
         const uri = vscode.Uri.file(path.join(root, name + '.atwiki'));
+        const existing = await store.read(uri.toString());
+        if (existing && existing.wiki !== config.wiki)
+          throw Error(
+            `このファイルは ${existing.wiki} に接続済みです。別の保存先フォルダを使用してください。`,
+          );
         let exists = false;
         try {
           const stat = await fs.lstat(uri.fsPath);
@@ -371,8 +419,9 @@ function registerWikiSync(vscode, context, dependencies = {}) {
   command('downloadWikiPage', pullWiki);
   command('pullWikiPage', pullWiki);
   command('createWikiPage', async () => {
-    const root = workspaceRoot();
-    const config = await api.session();
+    const root = await workspaceRoot();
+    if (!root) return;
+    const config = await api.session(connectionKey(root));
     const name = await vscode.window.showInputBox({
       prompt: '追加するページ名（空のページをWikiのデフォルト権限で作成）',
       ignoreFocusOut: true,
@@ -402,7 +451,7 @@ function registerWikiSync(vscode, context, dependencies = {}) {
   });
   command('compareWikiPage', async () => {
     const doc = document(),
-      config = await api.session(),
+      config = await documentSession(doc),
       entry = await linked(doc, config);
     const remote = await api.page(config, entry.page.pageid);
     const state = syncState(entry.page.source, doc.getText(), remote.source);
@@ -423,7 +472,7 @@ function registerWikiSync(vscode, context, dependencies = {}) {
     const doc = document(),
       before = doc.getText(),
       version = doc.version;
-    const config = await api.session(),
+    const config = await documentSession(doc),
       entry = await linked(doc, config),
       remote = await api.page(config, entry.page.pageid);
     let imageSummary = '';
@@ -484,7 +533,7 @@ function registerWikiSync(vscode, context, dependencies = {}) {
     const doc = document(),
       before = doc.getText(),
       version = doc.version;
-    const config = await api.session(),
+    const config = await documentSession(doc),
       entry = await linked(doc, config),
       remote = await api.page(config, entry.page.pageid);
     await diff(doc, remote.source, `${remote.pagename}: 現在の本家 ↔ 統合後の本文`);
@@ -506,7 +555,7 @@ function registerWikiSync(vscode, context, dependencies = {}) {
           '処理中に保存済みの本文が変更されました。差分を確認してもう一度実行してください。',
         );
     }
-    const config = await api.session(),
+    const config = await documentSession(doc),
       entry = await linked(doc, config),
       remote = await api.page(config, entry.page.pageid);
     await savedUnchanged();
@@ -571,4 +620,4 @@ function registerWikiSync(vscode, context, dependencies = {}) {
   });
   return actions;
 }
-module.exports = { SyncStore, registerWikiSync };
+module.exports = { connectionKey, SyncStore, registerWikiSync };

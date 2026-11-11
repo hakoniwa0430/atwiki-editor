@@ -516,6 +516,7 @@ test('競合解決は明示確認後に基準だけ更新する', async () => {
 
 test('接続フローは3項目の入力だけで固定URIの認可を行い秘密情報を保存する', async () => {
   const h = harness();
+  h.vscode.workspace.workspaceFolders = [{ uri: { scheme: 'file', fsPath: '/wiki' } }];
   const inputs = ['https://w.atwiki.jp/sample/', 'client', 'secret'];
   let pendingUrl;
   h.vscode.Uri.parse = (value) => ({ toString: () => value });
@@ -558,6 +559,7 @@ test('接続フローは3項目の入力だけで固定URIの認可を行い秘�
 test('権限不足の接続では以前の接続情報を保持する', async () => {
   const h = harness(),
     original = await h.context.secrets.get();
+  h.vscode.workspace.workspaceFolders = [{ uri: { scheme: 'file', fsPath: '/wiki' } }];
   const inputs = ['https://w.atwiki.jp/sample/', 'client', 'secret'];
   let pending;
   h.vscode.env = {
@@ -739,4 +741,41 @@ test('ページ追加で空ファイルを保存し関連付けて開く。同�
   await h.actions.createWikiPage();
   assert.equal(created, 1);
   assert.match(h.calls.messages.at(-1), /同名/);
+});
+
+test('フォルダ別の接続とトークン更新は他のフォルダに影響しない', async () => {
+  const { connectionKey } = require('../src/wiki-sync');
+  const a = connectionKey('/wiki-a'),
+    b = connectionKey('/wiki-b');
+  assert.notEqual(a, b);
+  assert.equal(a, connectionKey('/wiki-a/child/..'));
+  const values = new Map([
+    [a, JSON.stringify({ ...config, wiki: 'hoge', expires: 0 })],
+    [b, JSON.stringify({ ...config, wiki: 'fuga' })],
+  ]);
+  const api = new WikiApi(
+    { get: async (k) => values.get(k), store: async (k, v) => values.set(k, v) },
+    async () => ({ access_token: 'new', refresh_token: 'rotated', expires_in: 3600 }),
+  );
+  assert.equal((await api.session(a)).wiki, 'hoge');
+  assert.equal((await api.session(b)).wiki, 'fuga');
+  assert.equal(JSON.parse(values.get(a)).accessToken, 'new');
+  assert.equal(JSON.parse(values.get(b)).accessToken, 'access');
+  await assert.rejects(api.session(connectionKey('/unconnected')), /先に/);
+});
+
+test('現在の文書の所属フォルダで接続先を選ぶ', async () => {
+  const { connectionKey } = require('../src/wiki-sync');
+  const h = harness();
+  let root = '/wiki-a';
+  h.vscode.workspace.getWorkspaceFolder = () => ({ uri: { fsPath: root } });
+  const keys = [];
+  h.api.session = async (key) => {
+    keys.push(key);
+    return config;
+  };
+  await h.actions.compareWikiPage();
+  root = '/wiki-b';
+  await h.actions.compareWikiPage();
+  assert.deepEqual(keys, [connectionKey('/wiki-a'), connectionKey('/wiki-b')]);
 });
