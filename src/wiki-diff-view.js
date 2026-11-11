@@ -38,13 +38,7 @@ function registerWikiDiffView(vscode, context, services) {
         (doc) => doc.uri.toString() === row.uri.toString(),
       );
       const local = doc ? doc.getText() : await readSaved(row.uri.fsPath);
-      // VS Code normalizes both CRLF and lone CR when opening a file.
-      const normalize = (text) => text.replace(/\r\n?/g, '\n');
-      row.state = syncState(
-        normalize(row.base.source),
-        normalize(local),
-        normalize(row.remote.source),
-      );
+      row.state = syncState(row.base.source, local, row.remote.source);
       row.error = undefined;
     } catch (error) {
       row.state = error.code === 'ENOENT' ? 'missing' : 'error';

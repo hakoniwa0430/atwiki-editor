@@ -2,7 +2,7 @@
 const fs = require('node:fs/promises');
 const path = require('node:path');
 const crypto = require('node:crypto');
-const { WikiApi, wikiId, validatePage, syncState } = require('./wiki-api');
+const { WikiApi, wikiId, validatePage, syncState, normalizeText } = require('./wiki-api');
 const { WikiOAuth, REDIRECT } = require('./wiki-oauth');
 
 class SyncStore {
@@ -107,7 +107,7 @@ function registerWikiSync(vscode, context, dependencies = {}) {
         if (!pending) return;
         pendingPulls.delete(doc);
         try {
-          if ((await readSaved(doc.fileName)) === pending.remote.source)
+          if (normalizeText(await readSaved(doc.fileName)) === normalizeText(pending.remote.source))
             await store.save(doc.uri.toString(), pending.wiki, pending.remote);
         } catch (error) {
           notify('Error', `同期基準の保存に失敗しました: ${error.message}`);
@@ -533,10 +533,10 @@ function registerWikiSync(vscode, context, dependencies = {}) {
     if (state === 'remote') {
       await replace(doc, remote.source, before, version);
       // Keep the old baseline if an editor listener changed the replacement.
-      if (doc.getText() !== remote.source)
+      if (normalizeText(doc.getText()) !== normalizeText(remote.source))
         throw Error('本文が変更されたため同期基準を更新しませんでした。');
     }
-    if ((await readSaved(doc.fileName)) === remote.source) {
+    if (normalizeText(await readSaved(doc.fileName)) === normalizeText(remote.source)) {
       pendingPulls.delete(doc);
       await store.save(doc.uri.toString(), config.wiki, remote);
     } else {
@@ -578,13 +578,16 @@ function registerWikiSync(vscode, context, dependencies = {}) {
       entry = await linked(doc, config),
       remote = await api.page(config, entry.page.pageid);
     await savedUnchanged();
-    if (remote.source === before) {
+    if (normalizeText(remote.source) === normalizeText(before)) {
       await store.save(doc.uri.toString(), config.wiki, remote);
       notify('Information', `${remote.pagename}: 本家と一致しています。投稿は不要です。`);
       return;
     }
     await diff(doc, remote.source, `${remote.pagename}: 投稿する変更（本家 ↔ 保存済み）`, before);
-    if (remote.etag !== entry.page.etag || remote.source !== entry.page.source)
+    if (
+      remote.etag !== entry.page.etag ||
+      normalizeText(remote.source) !== normalizeText(entry.page.source)
+    )
       throw Error(
         '前回同期後に本家が更新されています。差分を確認して手動で統合し、「競合解決済みとして同期基準を更新」を実行してください。投稿は行いませんでした。',
       );

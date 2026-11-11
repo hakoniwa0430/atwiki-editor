@@ -5,7 +5,41 @@ const { renderTable } = require('./table');
 const { decode } = require('./safe-html');
 const structure = require('./plugin-structure');
 
+const MAX_SOURCE_LENGTH = 1000000;
+const MAX_PARSE_WORK = 2000000;
+const LIMIT_MESSAGE = 'プレビューの処理上限に達したため、表示を中止しました。';
+
 function render(source, options = {}) {
+  // A synchronous parser cannot be interrupted by a timer on the same event loop.
+  // Share a deterministic work budget across nested and included content.
+  const limit = new Error(LIMIT_MESSAGE);
+  let remaining = MAX_PARSE_WORK;
+  const spend = (amount) => {
+    remaining -= amount;
+    if (remaining < 0) throw limit;
+  };
+  try {
+    if (source.length > MAX_SOURCE_LENGTH) throw limit;
+    return renderSource(source, options, spend);
+  } catch (error) {
+    if (error !== limit) throw error;
+    return {
+      html: `<p class="unsupported">${LIMIT_MESSAGE}</p>`,
+      warnings: [LIMIT_MESSAGE],
+      diagnostics: [{ message: LIMIT_MESSAGE, line: 0 }],
+      headings: [],
+      usedPlugins: [],
+      title: null,
+    };
+  }
+}
+
+function renderSource(source, options, spend) {
+  function find(text, needle, start) {
+    const end = text.indexOf(needle, start);
+    spend((end < 0 ? text.length : end + needle.length) - start);
+    return end;
+  }
   const warnings = new Set(),
     headings = [],
     notes = [],
@@ -237,6 +271,7 @@ function render(source, options = {}) {
     return `<code class="unsupported">${escapeHtml(p.raw)}</code>`;
   }
   function inline(text, depth = 0, noLinks = false) {
+    spend(text.length);
     if (depth > 24) {
       warn('装飾の入れ子が深すぎます');
       return escapeHtml(text);
@@ -246,7 +281,7 @@ function render(source, options = {}) {
     while (i < text.length) {
       const rest = text.slice(i);
       if (rest.startsWith('[[') && !noLinks) {
-        const end = text.indexOf(']]', i + 2);
+        const end = find(text, ']]', i + 2);
         if (end >= 0) {
           const value = text.slice(i + 2, end),
             match = value.match(/>>?/);
@@ -267,6 +302,7 @@ function render(source, options = {}) {
         let j = i + 2,
           balance = 1;
         for (; j < text.length; j++) {
+          spend(1);
           if (text.startsWith('((', j)) {
             balance++;
             j++;
@@ -282,7 +318,7 @@ function render(source, options = {}) {
         }
       }
       if (rest.startsWith('$$')) {
-        const end = text.indexOf('$$', i + 2);
+        const end = find(text, '$$', i + 2);
         if (end >= 0) {
           result += dispatch(
             {
@@ -306,7 +342,7 @@ function render(source, options = {}) {
         continue;
       }
       if (text[i] === '&') {
-        const p = readPlugin(text, i);
+        const p = readPlugin(text, i, spend);
         if (p) {
           result += dispatch(p, depth + 1, currentLine);
           i = p.end;
@@ -320,7 +356,7 @@ function render(source, options = {}) {
         ['%%', 'del'],
       ]) {
         if (!rest.startsWith(mark)) continue;
-        const end = text.indexOf(mark, i + mark.length);
+        const end = find(text, mark, i + mark.length);
         if (end < 0) continue;
         result += `<${tag}>${inline(text.slice(i + mark.length, end), depth + 1, noLinks)}</${tag}>`;
         i = end + mark.length;
@@ -344,6 +380,7 @@ function render(source, options = {}) {
     return result;
   }
   function blocks(input, offset = 0, depth = 0) {
+    spend(input.length);
     if (depth > 24) {
       warn('ブロックの入れ子が深すぎます');
       return `<pre>${escapeHtml(input)}</pre>`;
@@ -352,6 +389,12 @@ function render(source, options = {}) {
     const lines = (normalized.endsWith('\n') ? normalized.slice(0, -1) : normalized).split('\n'),
       chunks = [],
       textLines = [];
+    const starts = [];
+    let position = 0;
+    for (const line of lines) {
+      starts.push(position);
+      position += line.length + 1;
+    }
     let i = 0,
       regions = 0,
       pending = [];
@@ -368,7 +411,7 @@ function render(source, options = {}) {
     }
     function blockPlugin(at) {
       if (!/^#[a-zA-Z]/.test(lines[at] || '')) return null;
-      const p = readPlugin(lines.slice(at).join('\n'));
+      const p = readPlugin(normalized, starts[at], spend);
       if (!p) return null;
       const consumed = p.raw.split('\n').length;
       const trailing = lines[at + consumed - 1]?.slice(p.raw.split('\n').at(-1).length) || '';
@@ -389,8 +432,8 @@ function render(source, options = {}) {
         continue;
       }
       if (line.startsWith('$$')) {
-        const joined = lines.slice(i).join('\n'),
-          end = joined.indexOf('$$', 2);
+        const joined = normalized.slice(starts[i]),
+          end = find(joined, '$$', 2);
         if (end >= 0) {
           push(
             dispatch(

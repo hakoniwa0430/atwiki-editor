@@ -805,3 +805,94 @@ test('現在の文書の所属フォルダで接続先を選ぶ', async () => {
   await h.actions.compareWikiPage();
   assert.deepEqual(keys, [connectionKey('/wiki-a'), connectionKey('/wiki-b')]);
 });
+test('同じ接続の並行更新は保存完了まで共有し、別接続は待たせない', async () => {
+  const values = new Map(['a', 'b'].map((key) => [key, JSON.stringify({ ...config, expires: 0 })]));
+  let finishStore;
+  let calls = 0;
+  const api = new WikiApi(
+    {
+      get: async (key) => values.get(key),
+      store: async (key, value) => {
+        if (key === 'a')
+          await new Promise((resolve) => {
+            finishStore = resolve;
+          });
+        values.set(key, value);
+      },
+    },
+    async () => {
+      calls++;
+      return { access_token: 'next', refresh_token: 'rotated', expires_in: 3600 };
+    },
+  );
+  const first = api.session('a');
+  while (!finishStore) await new Promise((resolve) => setImmediate(resolve));
+  const second = api.session('a');
+  assert.equal((await api.session('b')).accessToken, 'next');
+  assert.equal(calls, 2);
+  finishStore();
+  assert.deepEqual(await first, await second);
+  await api.session('a');
+  assert.equal(calls, 2);
+});
+
+test('共有された更新失敗を全呼び出しに返し、次回は再試行する', async () => {
+  let calls = 0;
+  const api = new WikiApi(secrets({ ...config, expires: 0 }), async () => {
+    if (++calls === 1) throw Error('offline');
+    return { access_token: 'next', refresh_token: 'rotated', expires_in: 3600 };
+  });
+  const results = await Promise.allSettled([api.session(), api.session()]);
+  assert.ok(results.every((result) => result.status === 'rejected'));
+  assert.equal(calls, 1);
+  assert.equal((await api.session()).accessToken, 'next');
+  assert.equal(calls, 2);
+});
+
+test('3方向比較は改行だけの違いを無視し、本文の変更は区別する', () => {
+  assert.equal(syncState('a\rb', 'a\r\nb', 'a\nb'), 'equal');
+  assert.equal(syncState('a\nb', 'a\r\nb', 'a\nc'), 'remote');
+  assert.equal(syncState('a\r\nb', 'a\nc', 'a\nb'), 'local');
+  assert.equal(syncState('a\nb', 'a\r\nc', 'a\nd'), 'conflict');
+});
+
+test('CRLF変換された取り込みを保存すると同期基準を更新する', async () => {
+  const h = harness({ base: page('a\nb'), local: 'a\r\nb', remote: page('a\nc', '"1-b"') });
+  h.vscode.workspace.applyEdit = async (edit) => {
+    h.doc.text = edit.text.replace(/\n/g, '\r\n');
+    h.doc.version++;
+    return true;
+  };
+  await h.actions.pullCurrentWikiPage();
+  assert.equal(h.doc.text, 'a\r\nc');
+  assert.equal(h.calls.saves.length, 0);
+  h.disk.text = h.doc.text;
+  await h.calls.onSave(h.doc);
+  assert.equal(h.calls.saves[0][2].source, 'a\nc');
+});
+
+test('改行が違っても保存済み本文が本家と一致すれば基準を更新し投稿しない', async () => {
+  const h = harness({ local: 'a\r\nb', remote: page('a\nb') });
+  await h.actions.pullCurrentWikiPage();
+  assert.equal(h.calls.saves.length, 1);
+  await h.actions.publishWikiPage();
+  assert.equal(h.calls.posts.length, 0);
+  assert.equal(h.calls.saves.length, 2);
+});
+
+test('取り込み時や保存時の実際の本文変更では基準を進めない', async () => {
+  for (const changeAt of ['replace', 'save']) {
+    const h = harness({ remote: page('a\nb') });
+    if (changeAt === 'replace') {
+      h.vscode.workspace.applyEdit = async () => {
+        h.doc.text = 'edited\r\nb';
+        h.doc.version++;
+        return true;
+      };
+    }
+    await h.actions.pullCurrentWikiPage();
+    h.disk.text = 'edited\r\nb';
+    await h.calls.onSave(h.doc);
+    assert.equal(h.calls.saves.length, 0);
+  }
+});

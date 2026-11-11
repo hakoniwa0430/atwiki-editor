@@ -156,7 +156,13 @@ function validatePage(page, expected) {
     throw Error('APIのページ情報が不正です。同期を中止しました。');
   return page;
 }
+function normalizeText(text) {
+  return text.replace(/\r\n?/g, '\n');
+}
 function syncState(base, local, remote) {
+  base = normalizeText(base);
+  local = normalizeText(local);
+  remote = normalizeText(remote);
   if (local === remote) return 'equal';
   if (local === base) return 'remote';
   if (remote === base) return 'local';
@@ -166,6 +172,7 @@ class WikiApi {
   constructor(secrets, transport = request) {
     this.secrets = secrets;
     this.transport = transport;
+    this.sessions = new Map();
   }
   async config(key = 'atwiki.oauth') {
     const raw = await this.secrets.get(key);
@@ -213,16 +220,26 @@ class WikiApi {
     });
   }
   async session(key = 'atwiki.oauth') {
-    let config = await this.config(key);
-    if (config.expires < Date.now() + 60000) {
-      config = await this.token(config, {
-        grant_type: 'refresh_token',
-        refresh_token: config.refreshToken,
-      });
-      await this.secrets.store(key, JSON.stringify(config));
+    if (this.sessions.has(key)) return this.sessions.get(key);
+    const pending = (async () => {
+      let config = await this.config(key);
+      if (config.expires < Date.now() + 60000) {
+        config = await this.token(config, {
+          grant_type: 'refresh_token',
+          refresh_token: config.refreshToken,
+        });
+        await this.secrets.store(key, JSON.stringify(config));
+      }
+      return config;
+    })();
+    this.sessions.set(key, pending);
+    try {
+      return await pending;
+    } finally {
+      this.sessions.delete(key);
     }
-    return config;
   }
+
   async page(config, id) {
     return validatePage(await this.call(config, `/pages/${id}`), id);
   }
@@ -263,5 +280,6 @@ module.exports = {
   request,
   validatePage,
   syncState,
+  normalizeText,
   WikiApi,
 };

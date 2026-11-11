@@ -68,9 +68,10 @@ function parameters(args) {
   return { parts, values, flags };
 }
 /** Reads balanced parentheses and repeated brace delimiters without regex backtracking. */
-function readPlugin(text, offset = 0) {
+function readPlugin(text, offset = 0, spend = () => {}) {
   const m = text.slice(offset).match(/^[&#]([a-zA-Z][\w]*)/);
   if (!m) return null;
+  spend(m[0].length);
   let end = offset + m[0].length,
     args = '',
     body = null,
@@ -80,6 +81,7 @@ function readPlugin(text, offset = 0) {
       j = end + 1,
       quote = false;
     for (; j < text.length && balance; j++) {
+      spend(1);
       if (text[j] === '"' && text[j - 1] !== '\\') {
         quote = !quote;
         continue;
@@ -94,13 +96,20 @@ function readPlugin(text, offset = 0) {
   }
   if (text[end] === '{') {
     let width = 1;
-    while (text[end + width] === '{') width++;
+    while (text[end + width] === '{') {
+      spend(1);
+      width++;
+    }
     bodyStart = end + width;
     if (width > 1) {
       let closing = text.indexOf('}'.repeat(width), bodyStart);
+      spend((closing < 0 ? text.length : closing + width) - bodyStart);
       if (closing < 0) return null;
       let run = width;
-      while (text[closing + run] === '}') run++;
+      while (text[closing + run] === '}') {
+        spend(1);
+        run++;
+      }
       closing += run - width;
       body = text.slice(bodyStart, closing);
       end = closing + width;
@@ -108,6 +117,7 @@ function readPlugin(text, offset = 0) {
       let balance = 1,
         j = end + 1;
       for (; j < text.length && balance; j++) {
+        spend(1);
         if (text[j] === '{') balance++;
         if (text[j] === '}') balance--;
       }
