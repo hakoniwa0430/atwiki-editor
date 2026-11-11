@@ -13,6 +13,7 @@ function activate(context) {
     require('node:path').join(context.globalStorageUri.fsPath, 'wiki-sync'),
   );
   require('./wiki-sync').registerWikiSync(vscode, context, { store: syncStore });
+  require('./wiki-browser').registerWikiBrowser(vscode, context, syncStore);
   if (vscode.workspace.createFileSystemWatcher) {
     const watcher = vscode.workspace.createFileSystemWatcher(
       new vscode.RelativePattern(vscode.Uri.file(syncStore.root), '*.json'),

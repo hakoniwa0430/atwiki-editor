@@ -67,6 +67,16 @@
     ],
     "commands": [
       {
+        "command": "atwiki.openWikiPageInBrowser",
+        "title": "アットウィキ: 現在のページをブラウザで開く",
+        "icon": "$(link-external)"
+      },
+      {
+        "command": "atwiki.openWikiUploadInBrowser",
+        "title": "アットウィキ: 現在のページの画像アップロード画面をブラウザで開く",
+        "icon": "$(file-media)"
+      },
+      {
         "command": "atwiki.convertImagesToWebpOnly",
         "title": "アットウィキ: 画像をWebPに変換する"
       },
@@ -129,6 +139,16 @@
     ],
     "menus": {
       "editor/title": [
+        {
+          "command": "atwiki.openWikiPageInBrowser",
+          "when": "(editorLangId == atwiki || editorLangId == plaintext) && resourceScheme == file",
+          "group": "navigation@4"
+        },
+        {
+          "command": "atwiki.openWikiUploadInBrowser",
+          "when": "(editorLangId == atwiki || editorLangId == plaintext) && resourceScheme == file",
+          "group": "navigation@5"
+        },
         {
           "command": "atwiki.openPreview",
           "when": "editorLangId == atwiki",
