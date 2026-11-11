@@ -136,6 +136,7 @@ function openPreviewSession({
           root.fsPath || path.dirname(document.fileName),
           name,
           document.fileName,
+          (await index.get(root.fsPath || path.dirname(document.fileName))).pages,
         );
         if (!resolved) {
           vscode.window.showInformationMessage(`ローカルページが見つかりません: ${name}`);

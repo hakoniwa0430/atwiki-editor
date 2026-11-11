@@ -5,7 +5,49 @@ const fs = require('node:fs/promises');
 const os = require('node:os');
 const path = require('node:path');
 const { PageIndex } = require('../src/page-index');
-const { loadPages } = require('../src/local-pages');
+const { loadPages, resolvePage } = require('../src/local-pages');
+
+test('synced slash titles resolve escaped filenames and preserve unsaved content', async (t) => {
+  const root = await fs.mkdtemp(path.join(os.tmpdir(), 'atwiki-title-'));
+  t.after(() => fs.rm(root, { recursive: true, force: true }));
+  const title = 'アルミオシオンの医術師/メンテナンスポート';
+  const file = path.join(root, 'アルミオシオンの医術師_メンテナンスポート-42.atwiki');
+  await fs.writeFile(file, 'disk');
+  const index = new PageIndex({
+    loadPages,
+    documents: () => [{ uri: { scheme: 'file' }, fileName: file, getText: () => 'edited' }],
+    enrichPages: async (pages) => {
+      for (const page of Object.values(pages)) page.sync = { pagename: title };
+    },
+  });
+  t.after(() => index.dispose());
+  const { pages } = await index.get(root);
+  assert.equal(pages[title].text, 'edited');
+  assert.deepEqual(await resolvePage(root, title, file, pages), {
+    file: await fs.realpath(file),
+    root,
+  });
+  assert.equal(await resolvePage(root, '未同期/ページ', file, pages), null);
+  await fs.unlink(file);
+  assert.equal(await resolvePage(root, title, file, pages), null);
+});
+
+test('title aliases do not overwrite local paths or guess between duplicate titles', async () => {
+  const index = new PageIndex({
+    loadPages: async () => ({
+      pages: {
+        'A/B': { text: 'local' },
+        A_B: { text: 'synced', sync: { pagename: 'A/B' } },
+        One: { sync: { pagename: 'Ambiguous/title' } },
+        Two: { sync: { pagename: 'Ambiguous/title' } },
+      },
+    }),
+  });
+  const { pages } = await index.get('/wiki');
+  assert.equal(pages['A/B'].text, 'local');
+  assert.equal(pages['Ambiguous/title'], undefined);
+  index.dispose();
+});
 test('shared scans preserve unsaved edits without changing the cached disk contents', async (t) => {
   const root = await fs.mkdtemp(path.join(os.tmpdir(), 'atwiki-index-'));
   t.after(() => fs.rm(root, { recursive: true, force: true }));

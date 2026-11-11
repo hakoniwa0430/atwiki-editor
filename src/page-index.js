@@ -68,6 +68,17 @@ class PageIndex {
         pages[name] = document ? { ...page, text: document.getText() } : { ...page };
       }
       await this.enrichPages(pages);
+      // Synced filenames escape characters such as '/', so retain the original title
+      // as an alias. Do not guess from underscores or resolve ambiguous titles.
+      const titles = new Map();
+      for (const page of Object.values(pages)) {
+        const title = page.sync?.pagename;
+        if (typeof title !== 'string' || !title) continue;
+        titles.set(title, titles.has(title) ? null : page);
+      }
+      for (const [title, page] of titles) {
+        if (page && !Object.hasOwn(pages, title)) pages[title] = page;
+      }
       return { ...indexed, pages };
     }
   }

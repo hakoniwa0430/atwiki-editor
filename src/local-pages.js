@@ -33,9 +33,14 @@ async function findPage(root, name) {
   }
   return null;
 }
-async function resolvePage(root, name, sourceFile) {
+async function resolvePage(root, name, sourceFile, pages = {}) {
   const direct = await findPage(root, name);
   if (direct) return { file: direct, root };
+  const indexed = Object.hasOwn(pages, name) && pages[name]?.file;
+  if (indexed && within(root, indexed)) {
+    const file = await findPage(root, path.relative(root, indexed));
+    if (file) return { file, root };
+  }
   // Only infer a root from a named ancestor matching the first page component.
   // Never turn ../ links into a search outside the selected wiki.
   const parts = name.split('/');
