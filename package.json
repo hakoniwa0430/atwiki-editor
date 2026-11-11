@@ -135,6 +135,11 @@
       {
         "command": "atwiki.createWikiPage",
         "title": "アットウィキ: ページを追加"
+      },
+      {
+        "command": "atwiki.refreshWikiDifferences",
+        "title": "アットウィキ: 全ページの差分を更新",
+        "icon": "$(refresh)"
       }
     ],
     "menus": {
@@ -222,6 +227,13 @@
           "command": "atwiki.disconnectWiki",
           "when": "resourceScheme == file && explorerResourceIsFolder && isWorkspaceTrusted",
           "group": "atwikiSync"
+        }
+      ],
+      "view/title": [
+        {
+          "command": "atwiki.refreshWikiDifferences",
+          "when": "view == atwiki.differences",
+          "group": "navigation"
         }
       ]
     },
@@ -326,6 +338,23 @@
           "description": "公開HTTPSのRSS/Atomを取得します。最大4フィード・各512KB、60秒キャッシュ。HTTP指定はHTTPSへ変換します。"
         }
       }
+    },
+    "viewsContainers": {
+      "activitybar": [
+        {
+          "id": "atwiki",
+          "title": "Atwiki",
+          "icon": "media/icons/atwiki-menu.svg"
+        }
+      ]
+    },
+    "views": {
+      "atwiki": [
+        {
+          "id": "atwiki.differences",
+          "name": "Wikiとの差分"
+        }
+      ]
     }
   },
   "scripts": {

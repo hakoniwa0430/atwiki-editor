@@ -185,7 +185,13 @@ test('同期基準を永続化し、不正な別ファイルの関連付けを�
   await assert.rejects(store.read(uri), /同期情報/);
 });
 
-function harness({ local = 'base', remote = page(), base = page(), wiki = 'sample' } = {}) {
+function harness({
+  local = 'base',
+  remote = page(),
+  base = page(),
+  wiki = 'sample',
+  sidebar = false,
+} = {}) {
   const disk = { text: local };
   const calls = { messages: [], diffs: [], saves: [], posts: [] };
   const uri = (value) => ({
@@ -257,6 +263,7 @@ function harness({ local = 'base', remote = page(), base = page(), wiki = 'sampl
       },
     },
     window: {
+      createTreeView: sidebar ? () => {} : undefined,
       registerUriHandler: (handler) => {
         calls.uriHandler = handler;
         return { dispose() {} };
@@ -288,6 +295,25 @@ function harness({ local = 'base', remote = page(), base = page(), wiki = 'sampl
   });
   return { actions, calls, doc, vscode, api, store, context, disk };
 }
+
+test('取得・投稿・比較の終了後に差分一覧を更新する', async (t) => {
+  let refreshed = 0;
+  t.mock.method(require('../src/wiki-diff-view'), 'registerWikiDiffView', () => ({
+    refresh: async () => {
+      refreshed++;
+    },
+    clear() {},
+  }));
+  const h = harness({ sidebar: true });
+  await h.actions.pullCurrentWikiPage();
+  assert.equal(refreshed, 1);
+  await h.actions.publishWikiPage();
+  assert.equal(refreshed, 2);
+  await h.actions.compareWikiPage();
+  assert.equal(refreshed, 3);
+  await h.actions.refreshWikiDifferences();
+  assert.equal(refreshed, 4);
+});
 
 test('同期と投稿の完了結果が通知され、ステータスバーにも残る', async () => {
   const h = harness();

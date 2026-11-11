@@ -58,6 +58,22 @@ class SyncStore {
     await fs.rename(temp, file);
     this.metadata.delete(uri);
   }
+  async entries() {
+    let names;
+    try {
+      names = await fs.readdir(this.root);
+    } catch (error) {
+      if (error.code === 'ENOENT') return [];
+      throw error;
+    }
+    const entries = [];
+    for (const name of names.filter((name) => /^[a-f0-9]{64}\.json$/.test(name))) {
+      const data = JSON.parse(await fs.readFile(path.join(this.root, name), 'utf8'));
+      const entry = await this.read(data.uri);
+      if (entry) entries.push(entry);
+    }
+    return entries;
+  }
 }
 
 function pageFileName(name) {
@@ -128,6 +144,7 @@ function registerWikiSync(vscode, context, dependencies = {}) {
     }),
   );
   let busy = false;
+  let sidebar;
   context.subscriptions.push(
     vscode.workspace.registerTextDocumentContentProvider('atwiki-remote', {
       provideTextDocumentContent(uri) {
@@ -181,6 +198,8 @@ function registerWikiSync(vscode, context, dependencies = {}) {
         notify('Error', `${label}に失敗しました: ${error.message}`);
       } finally {
         busy = false;
+        if (name === 'connectWiki' || name === 'disconnectWiki') sidebar?.clear();
+        else if (name !== 'refreshWikiDifferences') await sidebar?.refresh();
         if (status && lastResult === previousResult) {
           status.text = '$(info) アットウィキ: 処理終了';
           status.tooltip = '処理が終了しました。クリックして直近の結果を確認できます。';
@@ -618,6 +637,17 @@ function registerWikiSync(vscode, context, dependencies = {}) {
     const doc = document(await vscode.workspace.openTextDocument(uri));
     await publishDocument(doc);
   });
+  if (vscode.window.createTreeView) {
+    sidebar = require('./wiki-diff-view').registerWikiDiffView(vscode, context, {
+      api,
+      store,
+      allPages,
+      connectionKey,
+      readSaved,
+      diff,
+    });
+    command('refreshWikiDifferences', sidebar.refresh);
+  }
   return actions;
 }
 module.exports = { connectionKey, SyncStore, registerWikiSync };
