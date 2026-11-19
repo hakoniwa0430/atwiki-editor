@@ -260,13 +260,13 @@ class WikiApi {
       page.pageid,
     );
   }
-  async create(config, name) {
+  async create(config, name, body = '') {
     return validatePage(
       (
         await this.call(config, '/pages', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json', 'Idempotency-Key': crypto.randomUUID() },
-          body: JSON.stringify({ pagename: name, body: '' }),
+          body: JSON.stringify({ pagename: name, body }),
         })
       ).data,
     );

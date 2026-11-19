@@ -191,6 +191,7 @@ function harness({
   base = page(),
   wiki = 'sample',
   sidebar = false,
+  onEditorChange,
 } = {}) {
   const disk = { text: local };
   const calls = { messages: [], diffs: [], saves: [], posts: [] };
@@ -271,6 +272,7 @@ function harness({
       withProgress: async (_options, task) =>
         task({}, { onCancellationRequested: () => ({ dispose() {} }) }),
       createStatusBarItem: () => (calls.status = { show() {}, dispose() {} }),
+      onDidChangeActiveTextEditor: onEditorChange,
       activeTextEditor: { document: doc },
       showInformationMessage: (message) => calls.messages.push(message),
       showErrorMessage: (message) => calls.messages.push(message),
@@ -281,6 +283,7 @@ function harness({
     },
   };
   const store = {
+    entries: async () => [],
     read: async () => ({ wiki, page: base }),
     save: async (...args) => calls.saves.push(args),
   };
@@ -674,6 +677,18 @@ test('全ページ同期はエディターを開かず同名ファイルを直�
   await h.actions.pullWikiPage();
   assert.equal(dirtyDoc.text, 'unsaved local work');
   assert.equal(await fs.readFile(file, 'utf8'), 'final remote');
+  const drafts = path.join(root, 'drafts');
+  await fs.mkdir(drafts);
+  const mapped = path.join(drafts, 'テスト.txt');
+  h.vscode.Uri.parse = uri;
+  entries.delete(file);
+  entries.set(mapped, { wiki: config.wiki, page: page() });
+  h.store.entries = async () => [...entries].map(([uri, entry]) => ({ uri, ...entry }));
+  source = 'mapped update';
+  await h.actions.pullWikiPage();
+  assert.equal(await fs.readFile(mapped, 'utf8'), source);
+  assert.equal(await fs.readFile(file, 'utf8'), 'final remote');
+  assert.equal(entries.has(file), false);
   await assert.rejects(fs.access(path.join(root, '.atwiki-history')), { code: 'ENOENT' });
 });
 
@@ -730,6 +745,73 @@ test('比較は毎回Wikiの最新本文を取得し、未保存の本文と比�
   await h.actions.compareWikiPage();
   assert.equal(h.calls.diffs.length, 2);
   assert.match(h.calls.messages.at(-1), /offline/);
+});
+
+test('ファイルからのページ追加はすべての下線をスラッシュに戻して既存確認と投稿を行う', async () => {
+  const h = harness({ local: '本文' });
+  h.doc.fileName = '/wiki/作品_人物_詳細.atwiki';
+  h.vscode.workspace.getWorkspaceFolder = () => ({ uri: { fsPath: '/wiki' } });
+  h.store.read = async () => undefined;
+  const remote = { ...page('本文'), pagename: '作品/人物/詳細' };
+  let items = [remote];
+  h.api.call = async () => ({ items, next_cursor: null });
+  h.api.create = async (_config, name, text) => {
+    h.calls.posts.push([name, text]);
+    return remote;
+  };
+  await h.actions.createWikiPageFromFile();
+  assert.deepEqual(h.calls.posts, []);
+  assert.match(h.calls.messages.at(-1), /同名/);
+  items = [];
+  await h.actions.createWikiPageFromFile();
+  assert.deepEqual(h.calls.posts, [['作品/人物/詳細', '本文']]);
+  assert.deepEqual(h.calls.saves, [[h.doc.uri.toString(), config.wiki, remote]]);
+});
+
+test('表示判定は同時取得と取得済み一覧を共有し、作成操作では再取得する', async () => {
+  let refresh;
+  const h = harness({
+    onEditorChange: (callback) => {
+      refresh = callback;
+    },
+  });
+  h.store.read = async () => undefined;
+  h.vscode.workspace.getWorkspaceFolder = () => ({ uri: { fsPath: '/wiki' } });
+  let calls = 0;
+  let finish;
+  h.api.call = () => {
+    calls++;
+    return new Promise((resolve) => {
+      finish = resolve;
+    });
+  };
+  const pending = [refresh(), refresh()];
+  await new Promise((resolve) => setImmediate(resolve));
+  assert.equal(calls, 1);
+  finish({ items: [], next_cursor: null });
+  await Promise.all(pending);
+  await refresh();
+  assert.equal(calls, 1);
+  h.api.call = async () => {
+    calls++;
+    return { items: [{ pageid: 1, pagename: 'page' }], next_cursor: null };
+  };
+  await h.actions.createWikiPageFromFile();
+  assert.match(h.calls.messages.at(-1), /同名/);
+  assert.equal(h.calls.posts.length, 0);
+  assert.ok(calls >= 2);
+});
+
+test('現在のページだけ同期はタイトル操作で指定された文書を使用する', async () => {
+  const h = harness();
+  const uri = { scheme: 'file', toString: () => 'file:///wiki/other.txt' };
+  h.vscode.workspace.openTextDocument = async (target) => {
+    assert.equal(target, uri);
+    return { ...h.doc, fileName: '/wiki/other.txt', uri };
+  };
+  await h.actions.pullCurrentWikiPage(uri);
+  assert.equal(h.calls.saves[0][0], uri.toString());
+  assert.equal(h.calls.images[0][3], 'other');
 });
 
 test('ページ追加は空本文を送り、権限を指定しない', async () => {

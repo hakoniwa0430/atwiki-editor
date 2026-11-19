@@ -143,6 +143,7 @@ function registerWikiSync(vscode, context, dependencies = {}) {
         );
     }),
   );
+  const catalogs = new Map();
   let busy = false;
   let sidebar;
   context.subscriptions.push(
@@ -185,6 +186,7 @@ function registerWikiSync(vscode, context, dependencies = {}) {
           publishWikiPage: '投稿',
           updateWikiPage: '投稿',
           createWikiPage: 'ページ追加',
+          createWikiPageFromFile: 'ページ追加',
         }[name] || 'Wiki連携';
       const previousResult = lastResult;
       if (status) {
@@ -198,6 +200,18 @@ function registerWikiSync(vscode, context, dependencies = {}) {
         notify('Error', `${label}に失敗しました: ${error.message}`);
       } finally {
         busy = false;
+        if (
+          [
+            'connectWiki',
+            'disconnectWiki',
+            'createWikiPage',
+            'createWikiPageFromFile',
+            'pullWikiPage',
+            'downloadWikiPage',
+          ].includes(name)
+        )
+          catalogs.clear();
+        if (vscode.window.onDidChangeActiveTextEditor) void refreshCreateButton();
         if (name === 'connectWiki' || name === 'disconnectWiki') sidebar?.clear();
         else if (name !== 'refreshWikiDifferences') await sidebar?.refresh();
         if (status && lastResult === previousResult) {
@@ -378,6 +392,17 @@ function registerWikiSync(vscode, context, dependencies = {}) {
     let config = await api.session(connectionKey(root));
     const wiki = config.wiki;
     const pages = await allPages(config);
+    const mapped = new Map();
+    for (const entry of await store.entries()) {
+      if (entry.wiki !== wiki) continue;
+      const uri = vscode.Uri.parse(entry.uri);
+      if (uri.scheme !== 'file') continue;
+      const relative = path.relative(root, uri.fsPath);
+      if (!relative || relative.split(path.sep)[0] === '..' || path.isAbsolute(relative)) continue;
+      const owner = vscode.workspace.getWorkspaceFolder?.(uri);
+      if (owner && connectionKey(owner.uri.fsPath) !== connectionKey(root)) continue;
+      mapped.set(entry.page.pageid, mapped.has(entry.page.pageid) ? null : uri);
+    }
     let updated = 0,
       kept = 0;
     let imageUpdated = 0,
@@ -389,17 +414,29 @@ function registerWikiSync(vscode, context, dependencies = {}) {
         config = await api.session(connectionKey(root));
         if (config.wiki !== wiki) throw Error('接続先Wikiが変更されました。再同期してください。');
         const remote = await api.page(config, item.pageid);
-        let name = remote.pagename
-          .replace(/[<>:"/\\|?*\x00-\x1f]/g, '_')
-          .replace(/[. ]+$/g, '')
-          .slice(0, 100);
-        if (!name || /^(con|prn|aux|nul|com[0-9]|lpt[0-9])(?:\.|$)/i.test(name)) name = '_' + name;
-        const uri = vscode.Uri.file(path.join(root, name + '.atwiki'));
+        const savedUri = mapped.get(item.pageid);
+        if (savedUri === null) throw Error('複数のファイルがこのページに接続されています。');
+        const uri = savedUri || vscode.Uri.file(path.join(root, pageFileName(remote.pagename)));
+        if (savedUri) {
+          const relative = path.relative(
+            await fs.realpath(root),
+            await fs.realpath(path.dirname(uri.fsPath)),
+          );
+          if (relative.split(path.sep)[0] === '..' || path.isAbsolute(relative))
+            throw Error('保存先がワークスペースの外にあります。');
+        }
+        const name = path
+          .relative(root, uri.fsPath)
+          .split(path.sep)
+          .join('/')
+          .replace(/\.(atwiki|atw|txt)$/i, '');
         const existing = await store.read(uri.toString());
         if (existing && existing.wiki !== config.wiki)
           throw Error(
             `このファイルは ${existing.wiki} に接続済みです。別の保存先フォルダを使用してください。`,
           );
+        if (existing && existing.page.pageid !== remote.pageid)
+          throw Error('このファイルは別のページに接続されています。');
         let exists = false;
         try {
           const stat = await fs.lstat(uri.fsPath);
@@ -437,6 +474,76 @@ function registerWikiSync(vscode, context, dependencies = {}) {
   }
   command('downloadWikiPage', pullWiki);
   command('pullWikiPage', pullWiki);
+  function visibilityCatalog(config, folder) {
+    const key = connectionKey(folder.uri.fsPath) + ':' + config.wiki;
+    const cached = catalogs.get(key);
+    if (cached && cached.expires > Date.now()) return cached.pages;
+    const entry = { expires: Infinity, pages: allPages(config) };
+    catalogs.set(key, entry);
+    entry.pages.then(
+      () => {
+        entry.expires = Date.now() + 60_000;
+      },
+      () => {
+        if (catalogs.get(key) === entry) catalogs.delete(key);
+      },
+    );
+    return entry.pages;
+  }
+  async function newPageTarget(doc, forVisibility = false) {
+    const folder = vscode.workspace.getWorkspaceFolder(doc.uri);
+    if (!folder || (await store.read(doc.uri.toString()))) return;
+    const name = path.parse(doc.fileName).name.replaceAll('_', '/');
+    const config = await documentSession(doc);
+    const pages = await (forVisibility ? visibilityCatalog(config, folder) : allPages(config));
+    if (pages.some((page) => page.pagename === name)) return;
+    return { config, name };
+  }
+  let buttonRevision = 0;
+  async function refreshCreateButton() {
+    const revision = ++buttonRevision;
+    await vscode.commands.executeCommand('setContext', 'atwiki.newPagePaths', []);
+    try {
+      if (!vscode.workspace.isTrusted) return;
+      const doc = document();
+      if ((await newPageTarget(doc, true)) && revision === buttonRevision)
+        await vscode.commands.executeCommand('setContext', 'atwiki.newPagePaths', [doc.uri.fsPath]);
+    } catch {
+      // Keep the action hidden while the remote page list is unavailable.
+    }
+  }
+  if (vscode.window.onDidChangeActiveTextEditor) {
+    context.subscriptions.push(vscode.window.onDidChangeActiveTextEditor(refreshCreateButton));
+    void refreshCreateButton();
+  }
+  async function commandDocument(uri) {
+    return document(uri ? await vscode.workspace.openTextDocument(uri) : undefined);
+  }
+  command('createWikiPageFromFile', async (uri) => {
+    const doc = await commandDocument(uri);
+    const target = await newPageTarget(doc);
+    if (!target) throw Error('このファイルは対象外か、Wikiに同名のページがあります。');
+    const text = doc.getText();
+    const version = doc.version;
+    const confirm = await vscode.window.showWarningMessage(
+      `${target.config.wiki} に「${target.name}」を新規ページとして追加しますか？`,
+      { modal: true },
+      '追加する',
+    );
+    if (confirm !== '追加する') return;
+    unchanged(doc, text, version);
+    if (doc.isDirty && !(await doc.save())) return;
+    if (doc.getText() !== text) throw Error('保存時に本文が変更されました。再度実行してください。');
+    const page = await api.create(target.config, target.name, text);
+    try {
+      await store.save(doc.uri.toString(), target.config.wiki, page);
+    } catch (error) {
+      throw Error(
+        `「${page.pagename}」は作成済みです。同期情報の保存に失敗しました: ${error.message}`,
+      );
+    }
+    notify('Information', `${page.pagename}: ページ追加完了。`);
+  });
   command('createWikiPage', async () => {
     const root = await workspaceRoot();
     if (!root) return;
@@ -487,8 +594,8 @@ function registerWikiSync(vscode, context, dependencies = {}) {
     );
     vscode.window.showInformationMessage(labels[state]);
   });
-  command('pullCurrentWikiPage', async () => {
-    const doc = document(),
+  command('pullCurrentWikiPage', async (uri) => {
+    const doc = await commandDocument(uri),
       before = doc.getText(),
       version = doc.version;
     const config = await documentSession(doc),

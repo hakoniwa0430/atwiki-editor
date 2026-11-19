@@ -26,6 +26,9 @@
     "preview",
     "アットウィキ"
   ],
+  "activationEvents": [
+    "onLanguage:plaintext"
+  ],
   "main": "./src/extension.js",
   "capabilities": {
     "untrustedWorkspaces": {
@@ -134,6 +137,11 @@
         "icon": "$(cloud-upload)"
       },
       {
+        "command": "atwiki.createWikiPageFromFile",
+        "title": "アットウィキ: このファイルを新規ページとして追加",
+        "icon": "$(new-file)"
+      },
+      {
         "command": "atwiki.createWikiPage",
         "title": "アットウィキ: ページを追加"
       },
@@ -145,6 +153,11 @@
     ],
     "menus": {
       "editor/title": [
+        {
+          "command": "atwiki.createWikiPageFromFile",
+          "when": "resourceScheme == file && isWorkspaceTrusted && resourcePath in atwiki.newPagePaths",
+          "group": "navigation@3"
+        },
         {
           "command": "atwiki.openWikiPageInBrowser",
           "when": "(editorLangId == atwiki || editorLangId == plaintext) && resourceScheme == file",
