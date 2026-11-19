@@ -11,6 +11,8 @@ const schemas = {
   div: 'id class width height color bgcolor',
   hr: 'width height color',
   link2: 'title color bgcolor bordercolor target',
+  link_backup: 'page text',
+  link_diff: 'page text',
   link_atwiki: 'target',
   openclose: 'show',
   openclose2: 'show',

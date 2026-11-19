@@ -26,6 +26,8 @@ const options = {
   aname: 'option=',
   region: 'open closed remember',
   ls2: 'title reverse',
+  link_backup: 'page= text=',
+  link_diff: 'page= text=',
   link_atwiki: 'target=',
   contents: 'level= depth=',
   contents_line: 'level= depth=',

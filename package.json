@@ -2,7 +2,7 @@
   "name": "atwiki-local-preview",
   "displayName": "Atwiki Editor",
   "description": "アットウィキ記法をオフラインで編集・ライブプレビューする拡張機能",
-  "version": "1.1.1",
+  "version": "1.1.2",
   "publisher": "atwiki-local-tools",
   "license": "MIT",
   "repository": {
@@ -117,7 +117,8 @@
       },
       {
         "command": "atwiki.pullCurrentWikiPage",
-        "title": "アットウィキ: 現在のページだけ同期"
+        "title": "アットウィキ: 現在のページだけ同期",
+        "icon": "$(sync)"
       },
       {
         "command": "atwiki.resolveWikiConflict",
@@ -158,6 +159,11 @@
           "command": "atwiki.openPreview",
           "when": "editorLangId == atwiki",
           "group": "navigation@0"
+        },
+        {
+          "command": "atwiki.pullCurrentWikiPage",
+          "when": "(editorLangId == atwiki || editorLangId == plaintext) && resourceScheme == file && isWorkspaceTrusted",
+          "group": "navigation@1"
         },
         {
           "command": "atwiki.compareWikiPage",

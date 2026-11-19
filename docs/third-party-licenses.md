@@ -29,11 +29,11 @@ sharp 0.35.5 は Apache-2.0 です。`@img/sharp-win32-x64` には libvips 8.18.
 
 ## 対応ソースの入手
 
-v1.1.1 の配布時には、VSIX と同じ [GitHub Release](https://github.com/hakoniwa0430/atwiki-editor/releases/tag/v1.1.1) に次の3ファイルを掲載します。ブランチ上での準備だけでは公開は行われません。
+v1.1.2 の配布時には、VSIX と同じ [GitHub Release](https://github.com/hakoniwa0430/atwiki-editor/releases/tag/v1.1.2) に次の3ファイルを掲載します。ブランチ上での準備だけでは公開は行われません。
 
-- `atwiki-editor-1.1.1.vsix`
-- `atwiki-editor-1.1.1-third-party-sources.zip`
-- `atwiki-editor-1.1.1-third-party-sources.zip.sha256`
+- `atwiki-editor-1.1.2.vsix`
+- `atwiki-editor-1.1.2-third-party-sources.zip`
+- `atwiki-editor-1.1.2-third-party-sources.zip.sha256`
 
 ソース ZIP は、元のライブラリソース、Rust クレート、上流のビルド定義・パッチ、sharp 本体、ライセンス資料を含みます。ソースの取得に申請や追加料金は不要です。再配布者も対応するソースを一緒に提供してください。上流のプロジェクトトップページへのリンクだけを、対応ソースの代わりにしないでください。
 

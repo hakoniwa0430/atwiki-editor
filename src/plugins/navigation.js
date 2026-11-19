@@ -37,6 +37,21 @@ function plugin(p, ctx, depth = 0, line = 0) {
     );
     return link(body || target, target === '.' ? 'トップページ' : target, depth + 1);
   }
+  if (name === 'link_backup' || name === 'link_diff') {
+    const page = v.page || ctx.sourcePage || options.pageName;
+    const sync = options.pages?.[page]?.sync;
+    const backup = name === 'link_backup';
+    const label = v.text || (backup ? '編集履歴' : '最新版変更点');
+    if (
+      !sync ||
+      !/^[a-zA-Z0-9_-]+$/.test(sync.wiki) ||
+      !Number.isSafeInteger(sync.pageid) ||
+      sync.pageid < 1
+    )
+      return `<span title="同期済みページでリンクが有効になります">${esc(label)}</span>`;
+    const route = backup ? `backupx/${sync.pageid}/list.html` : `diffx/${sync.pageid}.html`;
+    return link(label, `https://w.atwiki.jp/${sync.wiki}/${route}`, depth + 1);
+  }
   if (name === 'link_atwiki') {
     const wiki = (flags[0] || '').replace(/@(?:wiki|www\d*)$/, '');
     if (!/^[a-zA-Z0-9_-]+$/.test(wiki)) {
@@ -67,7 +82,7 @@ function plugin(p, ctx, depth = 0, line = 0) {
 module.exports = {
   plugin,
   names:
-    'this_page wikiname wikiurl link_displaymode listbox memo memox this_url link_up link_parent link_path link_atwiki link_wikipedia topicpath back link_back forward link_forward reload'.split(
+    'this_page wikiname wikiurl link_displaymode listbox memo memox this_url link_up link_parent link_path link_backup link_diff link_atwiki link_wikipedia topicpath back link_back forward link_forward reload'.split(
       ' ',
     ),
 };
